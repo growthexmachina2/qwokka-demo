@@ -1,0 +1,593 @@
+{
+  "date_reference": "2026-10-28",
+  "commandes": [
+    {
+      "order_number": "CMD-26-1202",
+      "company": "Électricité Moreau",
+      "contact_email": "achats@elec-moreau.fr",
+      "order_date": "2026-10-27",
+      "delivery_date": "2026-11-09",
+      "status": "Commande_confirmee",
+      "scenario": "Confirmée, large marge",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1212",
+      "company": "Toitures Garnier",
+      "contact_email": "contact@toitures-garnier.fr",
+      "order_date": "2026-10-27",
+      "delivery_date": "2026-10-30",
+      "status": "Commande_confirmee",
+      "scenario": "Nouvelle commande, date trop proche : l’email de suivi annonce le retard",
+      "attendu": "{\"client\":\"SUIVI_COMMANDE\",\"alertes\":[\"PROBLEME_NON_RESOLU\"]}"
+    },
+    {
+      "order_number": "CMD-26-1214",
+      "company": "Paysages Mercier",
+      "contact_email": "bureau@paysages-mercier.fr",
+      "order_date": "2026-10-27",
+      "delivery_date": "2026-11-16",
+      "status": "Commande_confirmee",
+      "scenario": "Nouvelle commande confirmée hier : email de suivi avec le lien",
+      "attendu": "{\"client\":\"SUIVI_COMMANDE\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1215",
+      "company": "Électricité Moreau",
+      "contact_email": "achats@elec-moreau.fr",
+      "order_date": "2026-10-27",
+      "delivery_date": "2026-11-10",
+      "status": "Commande_confirmee",
+      "scenario": "Nouvelle commande d’un contact connu : email de suivi, même espace",
+      "attendu": "{\"client\":\"SUIVI_COMMANDE\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1201",
+      "company": "Menuiserie Lefèvre",
+      "contact_email": "achats@menuiserie-lefevre.fr",
+      "order_date": "2026-10-26",
+      "delivery_date": "2026-11-12",
+      "status": "Commande_confirmee",
+      "scenario": "Confirmée, large marge",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1229",
+      "company": "Bureau d’études Lemoine",
+      "contact_email": "projets@be-lemoine.fr",
+      "order_date": "2026-10-26",
+      "delivery_date": "",
+      "status": "Commande_confirmee",
+      "scenario": "Date de livraison vide",
+      "attendu": "{\"client\":null,\"alertes\":[\"DATE_MANQUANTE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1203",
+      "company": "Menuiserie Lefèvre",
+      "contact_email": "achats@menuiserie-lefevre.fr",
+      "order_date": "2026-10-22",
+      "delivery_date": "2026-11-05",
+      "status": "Commande_confirmee",
+      "scenario": "2e commande du même contact (espace de suivi commun)",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1230",
+      "company": "Électro Services Henry",
+      "contact_email": "service@electro-henry.fr",
+      "order_date": "2026-10-22",
+      "delivery_date": "2026-11-05",
+      "status": "Commande_confirmee",
+      "scenario": "Date avancée par le distributeur : pas d’email",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1228",
+      "company": "Aménagement Dupont",
+      "contact_email": "contact@amenagement-dupont.fr",
+      "order_date": "2026-10-21",
+      "delivery_date": "2026-11-05",
+      "status": "Annulee",
+      "scenario": "Statut hors API (annulation)",
+      "attendu": "{\"client\":null,\"alertes\":[\"STATUT_INCONNU\"]}"
+    },
+    {
+      "order_number": "CMD-26-1204",
+      "company": "Plomberie Dubois",
+      "contact_email": "m.dubois@plomberie-dubois.fr",
+      "order_date": "2026-10-20",
+      "delivery_date": "2026-11-03",
+      "status": "Commande_confirmee",
+      "scenario": "Veille du jour limite : rien encore",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1205",
+      "company": "Garage Petit & Fils",
+      "contact_email": "atelier@garage-petit.fr",
+      "order_date": "2026-10-19",
+      "delivery_date": "2026-11-02",
+      "status": "Commande_confirmee",
+      "scenario": "D − 3 : pièces manquantes, alerte « risque de retard »",
+      "attendu": "{\"client\":null,\"alertes\":[\"RISQUE_RETARD\"]}"
+    },
+    {
+      "order_number": "CMD-26-1206",
+      "company": "Chauffage Roux",
+      "contact_email": "j.roux@chauffage-roux.fr",
+      "order_date": "2026-10-16",
+      "delivery_date": "2026-11-02",
+      "status": "Commande_confirmee",
+      "scenario": "D − 3 : deuxième commande à risque",
+      "attendu": "{\"client\":null,\"alertes\":[\"RISQUE_RETARD\"]}"
+    },
+    {
+      "order_number": "CMD-26-1216",
+      "company": "Agencement Chevalier",
+      "contact_email": "a.chevalier@agencement-chevalier.fr",
+      "order_date": "2026-10-16",
+      "delivery_date": "2026-11-02",
+      "status": "En_preparation",
+      "scenario": "Entrée en préparation ce matin, dans les temps",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1220",
+      "company": "Ventilation Muller",
+      "contact_email": "k.muller@ventilation-muller.fr",
+      "order_date": "2026-10-16",
+      "delivery_date": "2026-10-28",
+      "status": "Expediee",
+      "scenario": "Expédiée hier : pas d’email",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1224",
+      "company": "Peinture Mathieu",
+      "contact_email": "contact@peinture-mathieu.fr",
+      "order_date": "2026-10-16",
+      "delivery_date": "2026-10-27",
+      "status": "Livree",
+      "scenario": "Livrée : confirmation",
+      "attendu": "{\"client\":\"LIVREE\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1207",
+      "company": "BTP Rhône Construction",
+      "contact_email": "achats@btp-rhone.fr",
+      "order_date": "2026-10-15",
+      "delivery_date": "2026-10-30",
+      "status": "Commande_confirmee",
+      "scenario": "D − 2, rien saisi : filet de sécurité (cas 3)",
+      "attendu": "{\"client\":\"RETARD_EN_COURS\",\"alertes\":[\"PROBLEME_NON_RESOLU\"]}"
+    },
+    {
+      "order_number": "CMD-26-1213",
+      "company": "Maçonnerie Clément",
+      "contact_email": "contact@maconnerie-clement",
+      "order_date": "2026-10-15",
+      "delivery_date": "2026-10-30",
+      "status": "Commande_confirmee",
+      "scenario": "Retard certain mais email invalide : message bloqué",
+      "attendu": "{\"client\":null,\"alertes\":[\"PROBLEME_NON_RESOLU\",\"EMAIL_INVALIDE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1217",
+      "company": "Sols & Revêtements Faure",
+      "contact_email": "achats@sols-faure.fr",
+      "order_date": "2026-10-15",
+      "delivery_date": "2026-10-29",
+      "status": "En_preparation",
+      "scenario": "En préparation depuis 2 j.o. : normal",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1221",
+      "company": "Charpente Leroy",
+      "contact_email": "contact@charpente-leroy.fr",
+      "order_date": "2026-10-15",
+      "delivery_date": "2026-10-27",
+      "status": "Expediee",
+      "scenario": "D + 1 sans livraison : alerte interne",
+      "attendu": "{\"client\":null,\"alertes\":[\"LIVRAISON_NON_CONFIRMEE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1208",
+      "company": "Atelier Girard",
+      "contact_email": "commandes@atelier-girard.fr",
+      "order_date": "2026-10-14",
+      "delivery_date": "2026-10-29",
+      "status": "Commande_confirmee",
+      "scenario": "Retard déjà annoncé hier : pas de doublon",
+      "attendu": "{\"client\":null,\"alertes\":[\"PROBLEME_NON_RESOLU\"]}"
+    },
+    {
+      "order_number": "CMD-26-1209",
+      "company": "Carrosserie Lambert",
+      "contact_email": "pieces@carrosserie-lambert.fr",
+      "order_date": "2026-10-14",
+      "delivery_date": "2026-11-03",
+      "status": "Commande_confirmee",
+      "scenario": "Nouvelle date saisie, +3 j.o. (cas 1, palier 1)",
+      "attendu": "{\"client\":\"NOUVELLE_DATE\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1219",
+      "company": "Isolation Vincent",
+      "contact_email": "chantiers@isolation-vincent.fr",
+      "order_date": "2026-10-14",
+      "delivery_date": "2026-10-28",
+      "status": "En_preparation",
+      "scenario": "Jour D, pas encore expédiée : message prudent",
+      "attendu": "{\"client\":\"RISQUE_RETARD_PREPA\",\"alertes\":[\"DATE_COMPROMISE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1222",
+      "company": "Outillage Pro Gauthier",
+      "contact_email": "commandes@outillage-gauthier.fr",
+      "order_date": "2026-10-14",
+      "delivery_date": "2026-10-26",
+      "status": "Expediee",
+      "scenario": "D + 2 sans livraison : message au client",
+      "attendu": "{\"client\":\"LIVRAISON_RETARDEE\",\"alertes\":[\"LIVRAISON_NON_CONFIRMEE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1226",
+      "company": "Clôtures Robin",
+      "contact_email": "achats@clotures-robin.fr",
+      "order_date": "2026-10-14",
+      "delivery_date": "2026-10-23",
+      "status": "Livree",
+      "scenario": "Livraison déjà confirmée",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1223",
+      "company": "Quincaillerie Lefebvre",
+      "contact_email": "magasin@quincaillerie-lefebvre.fr",
+      "order_date": "2026-10-13",
+      "delivery_date": "2026-10-23",
+      "status": "Expediee",
+      "scenario": "Client déjà prévenu : alerte interne seule",
+      "attendu": "{\"client\":null,\"alertes\":[\"LIVRAISON_NON_CONFIRMEE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1210",
+      "company": "Industries Fontaine",
+      "contact_email": "supply@industries-fontaine.fr",
+      "order_date": "2026-10-12",
+      "delivery_date": "2026-11-06",
+      "status": "Commande_confirmee",
+      "scenario": "Nouvelle date saisie, +6 j.o. (cas 3, palier 2)",
+      "attendu": "{\"client\":\"NOUVELLE_DATE\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1218",
+      "company": "Métallerie Rousseau",
+      "contact_email": "p.rousseau@metallerie-rousseau.fr",
+      "order_date": "2026-10-12",
+      "delivery_date": "2026-10-30",
+      "status": "En_preparation",
+      "scenario": "En préparation depuis 3 j.o. : délai dépassé",
+      "attendu": "{\"client\":null,\"alertes\":[\"PREPA_DEPASSEE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1225",
+      "company": "Échafaudages Perrin",
+      "contact_email": "logistique@echafaudages-perrin.fr",
+      "order_date": "2026-10-08",
+      "delivery_date": "2026-10-27",
+      "status": "Livree",
+      "scenario": "Livrée après un retard : excuses",
+      "attendu": "{\"client\":\"LIVREE_RETARD\",\"alertes\":[]}"
+    },
+    {
+      "order_number": "CMD-26-1211",
+      "company": "Froid Industriel Bonnet",
+      "contact_email": "logistique@froid-bonnet.fr",
+      "order_date": "2026-10-07",
+      "delivery_date": "2026-11-04",
+      "status": "Commande_confirmee",
+      "scenario": "2e report de date : retard répété",
+      "attendu": "{\"client\":\"RETARD_REPETE\",\"alertes\":[\"RETARD_REPETE\"]}"
+    },
+    {
+      "order_number": "CMD-26-1227",
+      "company": "Terrassement Morel",
+      "contact_email": "devis@terrassement-morel.fr",
+      "order_date": "2026-09-30",
+      "delivery_date": "2026-10-14",
+      "status": "Livree",
+      "scenario": "Déjà livrée à la première observation",
+      "attendu": "{\"client\":null,\"alertes\":[]}"
+    }
+  ],
+  "memoire": [
+    {
+      "order_number": "CMD-26-1201",
+      "contact_email": "achats@menuiserie-lefevre.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-11-12",
+      "initial_delivery_date": "2026-11-12",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1202",
+      "contact_email": "achats@elec-moreau.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-27",
+      "last_delivery_date": "2026-11-09",
+      "initial_delivery_date": "2026-11-09",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1203",
+      "contact_email": "achats@menuiserie-lefevre.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-22",
+      "last_delivery_date": "2026-11-05",
+      "initial_delivery_date": "2026-11-05",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1204",
+      "contact_email": "m.dubois@plomberie-dubois.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-20",
+      "last_delivery_date": "2026-11-03",
+      "initial_delivery_date": "2026-11-03",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1205",
+      "contact_email": "atelier@garage-petit.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-19",
+      "last_delivery_date": "2026-11-02",
+      "initial_delivery_date": "2026-11-02",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1206",
+      "contact_email": "j.roux@chauffage-roux.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-16",
+      "last_delivery_date": "2026-11-02",
+      "initial_delivery_date": "2026-11-02",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1207",
+      "contact_email": "achats@btp-rhone.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-15",
+      "last_delivery_date": "2026-10-30",
+      "initial_delivery_date": "2026-10-30",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1208",
+      "contact_email": "commandes@atelier-girard.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-14",
+      "last_delivery_date": "2026-10-29",
+      "initial_delivery_date": "2026-10-29",
+      "nb_glissements": 0,
+      "sent": "[\"RETARD_EN_COURS|2026-10-29\"]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1209",
+      "contact_email": "pieces@carrosserie-lambert.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-14",
+      "last_delivery_date": "2026-10-29",
+      "initial_delivery_date": "2026-10-29",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1210",
+      "contact_email": "supply@industries-fontaine.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-12",
+      "last_delivery_date": "2026-10-29",
+      "initial_delivery_date": "2026-10-29",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1211",
+      "contact_email": "logistique@froid-bonnet.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-07",
+      "last_delivery_date": "2026-10-29",
+      "initial_delivery_date": "2026-10-23",
+      "nb_glissements": 1,
+      "sent": "[\"NOUVELLE_DATE|2026-10-29\"]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1213",
+      "contact_email": "contact@maconnerie-clement",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-15",
+      "last_delivery_date": "2026-10-30",
+      "initial_delivery_date": "2026-10-30",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1216",
+      "contact_email": "a.chevalier@agencement-chevalier.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-16",
+      "last_delivery_date": "2026-11-02",
+      "initial_delivery_date": "2026-11-02",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1217",
+      "contact_email": "achats@sols-faure.fr",
+      "last_status": "En_preparation",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-29",
+      "initial_delivery_date": "2026-10-29",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1218",
+      "contact_email": "p.rousseau@metallerie-rousseau.fr",
+      "last_status": "En_preparation",
+      "status_since": "2026-10-23",
+      "last_delivery_date": "2026-10-30",
+      "initial_delivery_date": "2026-10-30",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1219",
+      "contact_email": "chantiers@isolation-vincent.fr",
+      "last_status": "En_preparation",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-28",
+      "initial_delivery_date": "2026-10-28",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1220",
+      "contact_email": "k.muller@ventilation-muller.fr",
+      "last_status": "En_preparation",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-28",
+      "initial_delivery_date": "2026-10-28",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1221",
+      "contact_email": "contact@charpente-leroy.fr",
+      "last_status": "Expediee",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-27",
+      "initial_delivery_date": "2026-10-27",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1222",
+      "contact_email": "commandes@outillage-gauthier.fr",
+      "last_status": "Expediee",
+      "status_since": "2026-10-23",
+      "last_delivery_date": "2026-10-26",
+      "initial_delivery_date": "2026-10-26",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1223",
+      "contact_email": "magasin@quincaillerie-lefebvre.fr",
+      "last_status": "Expediee",
+      "status_since": "2026-10-22",
+      "last_delivery_date": "2026-10-23",
+      "initial_delivery_date": "2026-10-23",
+      "nb_glissements": 0,
+      "sent": "[\"LIVRAISON_RETARDEE|2026-10-23\"]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1224",
+      "contact_email": "contact@peinture-mathieu.fr",
+      "last_status": "Expediee",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-27",
+      "initial_delivery_date": "2026-10-27",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1225",
+      "contact_email": "logistique@echafaudages-perrin.fr",
+      "last_status": "Expediee",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "2026-10-27",
+      "initial_delivery_date": "2026-10-22",
+      "nb_glissements": 1,
+      "sent": "[\"NOUVELLE_DATE|2026-10-27\"]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1226",
+      "contact_email": "achats@clotures-robin.fr",
+      "last_status": "Livree",
+      "status_since": "2026-10-23",
+      "last_delivery_date": "2026-10-23",
+      "initial_delivery_date": "2026-10-23",
+      "nb_glissements": 0,
+      "sent": "[\"LIVREE\"]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1228",
+      "contact_email": "contact@amenagement-dupont.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-21",
+      "last_delivery_date": "2026-11-05",
+      "initial_delivery_date": "2026-11-05",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1229",
+      "contact_email": "projets@be-lemoine.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-26",
+      "last_delivery_date": "",
+      "initial_delivery_date": "",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    },
+    {
+      "order_number": "CMD-26-1230",
+      "contact_email": "service@electro-henry.fr",
+      "last_status": "Commande_confirmee",
+      "status_since": "2026-10-22",
+      "last_delivery_date": "2026-11-09",
+      "initial_delivery_date": "2026-11-09",
+      "nb_glissements": 0,
+      "sent": "[]",
+      "last_seen": "2026-10-27"
+    }
+  ]
+}

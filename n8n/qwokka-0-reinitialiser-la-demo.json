@@ -1,0 +1,452 @@
+{
+  "name": "Qwokka · 0 · Réinitialiser la démo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "048ffafe-e0a4-45ea-b20a-0f91a0e1d6c8",
+      "name": "Réinitialiser la démo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "clear",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Qwokka · ERP commandes (démo)"
+        }
+      },
+      "id": "0ec2f552-fd93-44a0-84cd-2a4d752c147f",
+      "name": "Vider les commandes ERP",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "clear",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Qwokka · Mémoire du flux"
+        }
+      },
+      "id": "869ce39b-ff09-4151-9c3d-9b3249982576",
+      "name": "Vider la mémoire du flux",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        200
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// ===== Bibliothèque commune · Suivi de commande client (Growth Ex Machina × Qwokka) =====\n// Dates en chaînes AAAA-MM-JJ (fuseau Europe/Paris), jours ouvrés France, jeton d'espace de suivi, échappement HTML.\nconst pad2 = n => String(n).padStart(2, '0');\nconst toStr = d => `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;\nconst parseDate = s => {\n  if (s === null || s === undefined) return null;\n  const m = /^(\\d{4})-(\\d{2})-(\\d{2})/.exec(String(s).trim());\n  if (!m) return null;\n  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));\n  return isNaN(d) ? null : d;\n};\nconst parisToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());\nfunction easter(y) {\n  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,\n    f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,\n    i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),\n    month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;\n  return new Date(Date.UTC(y, month - 1, day));\n}\nfunction makeCalendar(fermetures) {\n  const cache = {}; const extra = new Set(fermetures || []);\n  const feries = y => { const e = easter(y); const p = n => { const d = new Date(e); d.setUTCDate(d.getUTCDate() + n); return toStr(d); };\n    return new Set([`${y}-01-01`, p(1), `${y}-05-01`, `${y}-05-08`, p(39), p(50), `${y}-07-14`, `${y}-08-15`, `${y}-11-01`, `${y}-11-11`, `${y}-12-25`]); };\n  const isBD = d => { const w = d.getUTCDay(); if (w === 0 || w === 6) return false; const y = d.getUTCFullYear(); if (!cache[y]) cache[y] = feries(y); return !cache[y].has(toStr(d)) && !extra.has(toStr(d)); };\n  const addBD = (d, n) => { const x = new Date(d); const s = n >= 0 ? 1 : -1; let k = Math.abs(n); while (k > 0) { x.setUTCDate(x.getUTCDate() + s); if (isBD(x)) k--; } return x; };\n  const diffBD = (a, b) => { if (toStr(a) === toStr(b)) return 0; const s = b > a ? 1 : -1; const x = new Date(a); let c = 0, guard = 0; while (toStr(x) !== toStr(b) && guard++ < 4000) { x.setUTCDate(x.getUTCDate() + s); if (isBD(x)) c += s; } return c; };\n  const addDays = (d, n) => { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; };\n  return { isBD, addBD, diffBD, addDays };\n}\nconst JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];\nconst MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];\nconst frDate = d => `${JOURS[d.getUTCDay()]} ${d.getUTCDate() === 1 ? '1er' : d.getUTCDate()} ${MOIS[d.getUTCMonth()]}`;\nconst frDateY = d => `${frDate(d)} ${d.getUTCFullYear()}`;\nconst frShort = d => `${pad2(d.getUTCDate())}/${pad2(d.getUTCMonth() + 1)}`;\nconst esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[c]));\n// Jeton de l'espace de suivi : empreinte de l'email + secret. Démo uniquement ; en production, lien signé ou lien de connexion.\nfunction jeton(email, secret) {\n  const str = String(email || '').trim().toLowerCase() + '|' + secret;\n  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;\n  for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }\n  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);\n  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);\n  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36) + (h1 >>> 0).toString(36);\n}\nconst EMAIL_RE = /^[^\\s@]+@[^\\s@]+\\.[a-z]{2,}$/i;\nconst STATUTS = ['Commande_confirmee', 'En_preparation', 'Expediee', 'Livree'];\nconst parseSent = s => { try { const v = JSON.parse(s || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } };\n// ===== Jeu de démo : 30 commandes « ERP » + mémoire de la veille, dates relatives au jour du lancement =====\n// Chaque commande porte son scénario et le résultat attendu : le jeu sert aussi de test de non-régression.\nfunction genererDemo(cfg) {\n  const cal = makeCalendar(cfg.fermetures);\n  const T = parseDate(cfg.date_reference);\n  const bd = n => toStr(cal.addBD(T, n));          // T ± n jours ouvrés\n  const hier = toStr(cal.addDays(T, -1));\n  const S = (o, m, scenario, attendu) => ({ o, m, scenario, attendu });\n  const k = (t, d) => `${t}|${d}`;\n  const L = [\n    // --- Phase 1 et 2 : commande confirmée, approvisionnement\n    S({ company: 'Menuiserie Lefèvre', contact_email: 'achats@menuiserie-lefevre.fr', order_date: bd(-2), delivery_date: bd(10), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-2) }, 'Confirmée, large marge', { client: null, alertes: [] }),\n    S({ company: 'Électricité Moreau', contact_email: 'achats@elec-moreau.fr', order_date: bd(-1), delivery_date: bd(8), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-1) }, 'Confirmée, large marge', { client: null, alertes: [] }),\n    S({ company: 'Menuiserie Lefèvre', contact_email: 'achats@menuiserie-lefevre.fr', order_date: bd(-4), delivery_date: bd(6), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-4) }, '2e commande du même contact (espace de suivi commun)', { client: null, alertes: [] }),\n    S({ company: 'Plomberie Dubois', contact_email: 'm.dubois@plomberie-dubois.fr', order_date: bd(-6), delivery_date: bd(4), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-6) }, 'Veille du jour limite : rien encore', { client: null, alertes: [] }),\n    S({ company: 'Garage Petit & Fils', contact_email: 'atelier@garage-petit.fr', order_date: bd(-7), delivery_date: bd(3), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-7) }, 'D − 3 : pièces manquantes, alerte « risque de retard »', { client: null, alertes: ['RISQUE_RETARD'] }),\n    S({ company: 'Chauffage Roux', contact_email: 'j.roux@chauffage-roux.fr', order_date: bd(-8), delivery_date: bd(3), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-8) }, 'D − 3 : deuxième commande à risque', { client: null, alertes: ['RISQUE_RETARD'] }),\n    S({ company: 'BTP Rhône Construction', contact_email: 'achats@btp-rhone.fr', order_date: bd(-9), delivery_date: bd(2), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-9) }, 'D − 2, rien saisi : filet de sécurité (cas 3)', { client: 'RETARD_EN_COURS', alertes: ['PROBLEME_NON_RESOLU'] }),\n    S({ company: 'Atelier Girard', contact_email: 'commandes@atelier-girard.fr', order_date: bd(-10), delivery_date: bd(1), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-10), sent: [k('RETARD_EN_COURS', bd(1))] }, 'Retard déjà annoncé hier : pas de doublon', { client: null, alertes: ['PROBLEME_NON_RESOLU'] }),\n    S({ company: 'Carrosserie Lambert', contact_email: 'pieces@carrosserie-lambert.fr', order_date: bd(-10), delivery_date: bd(4), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-10), last_delivery_date: bd(1) }, 'Nouvelle date saisie, +3 j.o. (cas 1, palier 1)', { client: 'NOUVELLE_DATE', alertes: [] }),\n    S({ company: 'Industries Fontaine', contact_email: 'supply@industries-fontaine.fr', order_date: bd(-12), delivery_date: bd(7), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-12), last_delivery_date: bd(1) }, 'Nouvelle date saisie, +6 j.o. (cas 3, palier 2)', { client: 'NOUVELLE_DATE', alertes: [] }),\n    S({ company: 'Froid Industriel Bonnet', contact_email: 'logistique@froid-bonnet.fr', order_date: bd(-15), delivery_date: bd(5), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-15), last_delivery_date: bd(1), initial_delivery_date: bd(-3), nb_glissements: 1, sent: [k('NOUVELLE_DATE', bd(1))] }, '2e report de date : retard répété', { client: 'RETARD_REPETE', alertes: ['RETARD_REPETE'] }),\n    S({ company: 'Toitures Garnier', contact_email: 'contact@toitures-garnier.fr', order_date: bd(-1), delivery_date: bd(2), status: 'Commande_confirmee' }, null, 'Nouvelle commande, date trop proche : l’email de suivi annonce le retard', { client: 'SUIVI_COMMANDE', alertes: ['PROBLEME_NON_RESOLU'] }),\n    S({ company: 'Maçonnerie Clément', contact_email: 'contact@maconnerie-clement', order_date: bd(-9), delivery_date: bd(2), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-9) }, 'Retard certain mais email invalide : message bloqué', { client: null, alertes: ['PROBLEME_NON_RESOLU', 'EMAIL_INVALIDE'] }),\n    S({ company: 'Paysages Mercier', contact_email: 'bureau@paysages-mercier.fr', order_date: bd(-1), delivery_date: bd(12), status: 'Commande_confirmee' }, null, 'Nouvelle commande confirmée hier : email de suivi avec le lien', { client: 'SUIVI_COMMANDE', alertes: [] }),\n    S({ company: 'Électricité Moreau', contact_email: 'achats@elec-moreau.fr', order_date: bd(-1), delivery_date: bd(9), status: 'Commande_confirmee' }, null, 'Nouvelle commande d’un contact connu : email de suivi, même espace', { client: 'SUIVI_COMMANDE', alertes: [] }),\n    // --- Préparation\n    S({ company: 'Agencement Chevalier', contact_email: 'a.chevalier@agencement-chevalier.fr', order_date: bd(-8), delivery_date: bd(3), status: 'En_preparation' }, { last_status: 'Commande_confirmee', status_since: bd(-8) }, 'Entrée en préparation ce matin, dans les temps', { client: null, alertes: [] }),\n    S({ company: 'Sols & Revêtements Faure', contact_email: 'achats@sols-faure.fr', order_date: bd(-9), delivery_date: bd(1), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'En préparation depuis 2 j.o. : normal', { client: null, alertes: [] }),\n    S({ company: 'Métallerie Rousseau', contact_email: 'p.rousseau@metallerie-rousseau.fr', order_date: bd(-12), delivery_date: bd(2), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-3) }, 'En préparation depuis 3 j.o. : délai dépassé', { client: null, alertes: ['PREPA_DEPASSEE'] }),\n    S({ company: 'Isolation Vincent', contact_email: 'chantiers@isolation-vincent.fr', order_date: bd(-10), delivery_date: bd(0), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'Jour D, pas encore expédiée : message prudent', { client: 'RISQUE_RETARD_PREPA', alertes: ['DATE_COMPROMISE'] }),\n    // --- Transport\n    S({ company: 'Ventilation Muller', contact_email: 'k.muller@ventilation-muller.fr', order_date: bd(-8), delivery_date: bd(0), status: 'Expediee' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'Expédiée hier : pas d’email', { client: null, alertes: [] }),\n    S({ company: 'Charpente Leroy', contact_email: 'contact@charpente-leroy.fr', order_date: bd(-9), delivery_date: bd(-1), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-2) }, 'D + 1 sans livraison : alerte interne', { client: null, alertes: ['LIVRAISON_NON_CONFIRMEE'] }),\n    S({ company: 'Outillage Pro Gauthier', contact_email: 'commandes@outillage-gauthier.fr', order_date: bd(-10), delivery_date: bd(-2), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-3) }, 'D + 2 sans livraison : message au client', { client: 'LIVRAISON_RETARDEE', alertes: ['LIVRAISON_NON_CONFIRMEE'] }),\n    S({ company: 'Quincaillerie Lefebvre', contact_email: 'magasin@quincaillerie-lefebvre.fr', order_date: bd(-11), delivery_date: bd(-3), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-4), sent: [k('LIVRAISON_RETARDEE', bd(-3))] }, 'Client déjà prévenu : alerte interne seule', { client: null, alertes: ['LIVRAISON_NON_CONFIRMEE'] }),\n    // --- Livraison\n    S({ company: 'Peinture Mathieu', contact_email: 'contact@peinture-mathieu.fr', order_date: bd(-8), delivery_date: bd(-1), status: 'Livree' }, { last_status: 'Expediee', status_since: bd(-2) }, 'Livrée : confirmation', { client: 'LIVREE', alertes: [] }),\n    S({ company: 'Échafaudages Perrin', contact_email: 'logistique@echafaudages-perrin.fr', order_date: bd(-14), delivery_date: bd(-1), status: 'Livree' }, { last_status: 'Expediee', status_since: bd(-2), initial_delivery_date: bd(-4), nb_glissements: 1, sent: [k('NOUVELLE_DATE', bd(-1))] }, 'Livrée après un retard : excuses', { client: 'LIVREE_RETARD', alertes: [] }),\n    S({ company: 'Clôtures Robin', contact_email: 'achats@clotures-robin.fr', order_date: bd(-10), delivery_date: bd(-3), status: 'Livree' }, { last_status: 'Livree', status_since: bd(-3), sent: ['LIVREE'] }, 'Livraison déjà confirmée', { client: null, alertes: [] }),\n    S({ company: 'Terrassement Morel', contact_email: 'devis@terrassement-morel.fr', order_date: bd(-20), delivery_date: bd(-10), status: 'Livree' }, null, 'Déjà livrée à la première observation', { client: null, alertes: [] }),\n    // --- Données\n    S({ company: 'Aménagement Dupont', contact_email: 'contact@amenagement-dupont.fr', order_date: bd(-5), delivery_date: bd(6), status: 'Annulee' }, { last_status: 'Commande_confirmee', status_since: bd(-5) }, 'Statut hors API (annulation)', { client: null, alertes: ['STATUT_INCONNU'] }),\n    S({ company: 'Bureau d’études Lemoine', contact_email: 'projets@be-lemoine.fr', order_date: bd(-2), delivery_date: '', status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-2) }, 'Date de livraison vide', { client: null, alertes: ['DATE_MANQUANTE'] }),\n    S({ company: 'Électro Services Henry', contact_email: 'service@electro-henry.fr', order_date: bd(-4), delivery_date: bd(6), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-4), last_delivery_date: bd(8) }, 'Date avancée par le distributeur : pas d’email', { client: null, alertes: [] }),\n  ];\n  const commandes = [], memoire = [];\n  L.forEach((s, i) => {\n    const num = `CMD-${toStr(T).slice(2, 4)}-${String(1201 + i).padStart(4, '0')}`;\n    commandes.push({ order_number: num, ...s.o, scenario: s.scenario, attendu: JSON.stringify(s.attendu) });\n    if (s.m) memoire.push({ order_number: num, contact_email: s.o.contact_email, last_status: s.m.last_status, status_since: s.m.status_since,\n      last_delivery_date: s.m.last_delivery_date || s.o.delivery_date, initial_delivery_date: s.m.initial_delivery_date || s.m.last_delivery_date || s.o.delivery_date,\n      nb_glissements: s.m.nb_glissements || 0, sent: JSON.stringify(s.m.sent || []), last_seen: hier });\n  });\n  commandes.sort((a, b) => (b.order_date || '').localeCompare(a.order_date || ''));\n  return { commandes, memoire };\n}\n\n// ===== Nœud : jeu de démo (dates relatives à aujourd'hui) =====\nconst cfg = { date_reference: new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date()), fermetures: [] };\nconst d = genererDemo(cfg);\nreturn [...d.commandes.map(row => ({ json: { table: 'commandes', row } })), ...d.memoire.map(row => ({ json: { table: 'memoire', row } }))];\n"
+      },
+      "id": "0fe9b282-5f72-4055-9059-565c2ddf9e0c",
+      "name": "Générer le jeu de démo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        200
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "Commandes",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a6532a1b-cca0-47a7-a637-8078e553a333",
+                    "leftValue": "={{ $json.table }}",
+                    "rightValue": "commandes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "Mémoire",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eb4d21dc-8ca2-4b9d-8ff0-a837bdfa2b2e",
+                    "leftValue": "={{ $json.table }}",
+                    "rightValue": "memoire",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "af9c79e3-5506-4b99-b6ca-73d7b0b69a1e",
+      "name": "Répartir par table",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        960,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Qwokka · ERP commandes (démo)"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_number": "={{ $json.row.order_number }}",
+            "company": "={{ $json.row.company }}",
+            "contact_email": "={{ $json.row.contact_email }}",
+            "order_date": "={{ $json.row.order_date }}",
+            "delivery_date": "={{ $json.row.delivery_date }}",
+            "status": "={{ $json.row.status }}",
+            "scenario": "={{ $json.row.scenario }}",
+            "attendu": "={{ $json.row.attendu }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "order_number",
+              "displayName": "order_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "delivery_date",
+              "displayName": "delivery_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scenario",
+              "displayName": "scenario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "attendu",
+              "displayName": "attendu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      },
+      "id": "166a0ba3-e2fa-4adb-a30c-d0ff8dea53c9",
+      "name": "Écrire les commandes ERP",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Qwokka · Mémoire du flux"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_number": "={{ $json.row.order_number }}",
+            "contact_email": "={{ $json.row.contact_email }}",
+            "last_status": "={{ $json.row.last_status }}",
+            "status_since": "={{ $json.row.status_since }}",
+            "last_delivery_date": "={{ $json.row.last_delivery_date }}",
+            "initial_delivery_date": "={{ $json.row.initial_delivery_date }}",
+            "nb_glissements": "={{ $json.row.nb_glissements }}",
+            "sent": "={{ $json.row.sent }}",
+            "last_seen": "={{ $json.row.last_seen }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "order_number",
+              "displayName": "order_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_status",
+              "displayName": "last_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_since",
+              "displayName": "status_since",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_delivery_date",
+              "displayName": "last_delivery_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "initial_delivery_date",
+              "displayName": "initial_delivery_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nb_glissements",
+              "displayName": "nb_glissements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sent",
+              "displayName": "sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_seen",
+              "displayName": "last_seen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      },
+      "id": "5c088f1a-0f83-4ca6-a181-821116231bfb",
+      "name": "Écrire la mémoire de la veille",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Réinitialiser la démo\nVide les deux tables puis recrée 30 commandes « ERP » et la mémoire de la veille, avec des dates relatives à aujourd’hui. Chaque commande porte son scénario et le résultat attendu.",
+        "width": 520,
+        "height": 180,
+        "color": 4
+      },
+      "id": "4d6d4057-6606-4b02-af49-a199c0d69a75",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -120
+      ]
+    }
+  ],
+  "connections": {
+    "Réinitialiser la démo": {
+      "main": [
+        [
+          {
+            "node": "Vider les commandes ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vider les commandes ERP": {
+      "main": [
+        [
+          {
+            "node": "Vider la mémoire du flux",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vider la mémoire du flux": {
+      "main": [
+        [
+          {
+            "node": "Générer le jeu de démo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Générer le jeu de démo": {
+      "main": [
+        [
+          {
+            "node": "Répartir par table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Répartir par table": {
+      "main": [
+        [
+          {
+            "node": "Écrire les commandes ERP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Écrire la mémoire de la veille",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Paris"
+  },
+  "meta": {
+    "description": "Recrée le jeu de 30 commandes de démo."
+  }
+}

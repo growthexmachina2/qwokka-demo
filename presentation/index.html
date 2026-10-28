@@ -1,0 +1,629 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Présentation · Suivi de commande client</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Permanent+Marker&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#E9E6DF;--ink:#15171C;--paper:#F7F5F0;--accent:#FF4D1F;--muted:#5F6470}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,system-ui,Arial,sans-serif}
+header.top{position:sticky;top:0;z-index:5;background:var(--ink);color:var(--paper);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px max(16px,env(safe-area-inset-left))}
+header.top a{color:var(--paper)}
+header.top .t{font-weight:800;flex:1;min-width:200px}
+button{font:inherit;font-weight:600;border-radius:999px;padding:8px 16px;border:1px solid #555;background:transparent;color:var(--paper);cursor:pointer}
+button.p{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+main{max-width:1280px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-left)) 64px;display:grid;gap:20px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;box-shadow:0 2px 18px rgba(0,0,0,.12);background:#fff}
+.scaler{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden}
+section *{margin:0;box-sizing:border-box}
+section ul{padding-left:1.15em} section li{margin:0}
+section table{border-collapse:collapse}
+section th{font-family:'JetBrains Mono',monospace;font-weight:500;color:#5F6470;font-size:22px;padding:10px 16px 10px 12px;border-bottom:2px solid #15171C;vertical-align:bottom}
+section td{padding:14px 16px 14px 12px;border-bottom:1px solid #DCD8CF;vertical-align:top}
+section aside{display:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+.notes{background:var(--paper);border-radius:10px;padding:14px 18px;font-size:15px;line-height:1.5;color:var(--muted)}
+body:not(.show-notes) .notes{display:none}
+#pres{position:fixed;inset:0;background:#000;z-index:20;display:flex;align-items:center;justify-content:center}
+#pres .frame{border-radius:0;box-shadow:none}
+#pres .hint{position:absolute;bottom:10px;right:16px;color:#888;font-size:13px}
+[hidden]{display:none!important}
+</style></head><body>
+<header class="top"><span class="t">Suivi de commande client · Qwokka <span style="opacity:.6;font-weight:400">· Growth Ex Machina</span></span>
+<a href="../">← Kit de démo</a><button id="notes">Notes</button><button class="p" id="go">Présenter</button></header>
+<main id="list">
+<div class="frame" id="s1" data-n="1"><div class="scaler"><section id="cover" data-transition="fade" style="background:#15171C;color:#F2F0EA;font-family:'Sora', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:flex-end;gap:36px">
+<p style="position:absolute;left:120px;top:92px;width:320px;font-family:'Permanent Marker', 'Brush Script MT', cursive;font-size:56px;line-height:1;color:#FF5A2C;transform:rotate(-7deg)">Growth</p>
+<p style="position:absolute;left:128px;top:150px;width:700px;font-size:40px;font-weight:800;letter-spacing:10px;line-height:1">EX MACHINA</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#FF8A66">Cas pratique · Lead Delivery &amp; AI Automation · Qwokka</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;gap:36px">
+<h1 style="font-size:150px;font-weight:800;letter-spacing:-5px;line-height:1">Libérer</h1>
+<p style="font-size:56px;font-weight:600;line-height:1;color:#FF8A66">le support client</p>
+</div>
+<div style="display:flex;align-items:baseline;gap:36px">
+<h1 style="font-size:150px;font-weight:800;letter-spacing:-5px;line-height:1">Anticiper</h1>
+<p style="font-size:56px;font-weight:600;line-height:1;color:#FF8A66">les demandes clients</p>
+</div>
+</div>
+<p style="font-size:36px;line-height:1.4;color:#A3A7B1;max-width:1300px">Suivi de commande client automatisé : analyse du brief, scénarios, recommandations et démo n8n.</p>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:96px;height:6px;background:#FF5A2C"></div>
+<p style="font-size:28px;color:#F2F0EA">Gabriel Videira · Growth Ex Machina</p>
+</div>
+<aside>Ouvrir sur la promesse : le distributeur a déjà toutes les données, il lui manque quelqu’un qui prévient. Annoncer le déroulé : la demande, les scénarios, les règles, la mise en œuvre, puis la démo live.</aside>
+</section></div></div>
+<div class="frame" id="s2" data-n="2"><div class="scaler"><section id="brief" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">01 · Le brief</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Ce que dit le CEO, en 4 familles.</h2>
+</div>
+<div style="display:flex;gap:64px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'Permanent Marker', 'Brush Script MT', cursive;font-size:96px;line-height:0.6;color:#FF4D1F">«</p>
+<p style="font-size:30px;line-height:1.5;color:#15171C">On sature côté support. Une grosse partie des tickets qu’on reçoit, c’est des clients qui nous demandent où en est leur commande, ou qui râlent parce qu’on ne les a pas prévenus d’un retard. Toutes les infos sont dans notre ERP. Mais personne ne fait le boulot de prévenir en amont. On aimerait automatiser ça, avec quelque chose de simple qu’on puisse faire évoluer. Pas besoin d’usine à gaz pour démarrer.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:6px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Symptôme</h3>
+<p style="font-size:28px;line-height:1.4">« On sature » : l’objectif est de faire baisser le volume de tickets.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Deux problèmes</h3>
+<p style="font-size:28px;line-height:1.4">Un manque d’information (« où en est ma commande ? ») et une perte de confiance (« pas prévenu du retard »).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Ressource et cause racine</h3>
+<p style="font-size:28px;line-height:1.4">Tout est dans l’ERP. Personne n’est chargé de prévenir en amont.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Demande et contraintes</h3>
+<p style="font-size:28px;line-height:1.4">Automatiser, simple, évolutif. « Pour démarrer » : une suite est déjà envisagée.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">01 / 17</p>
+<aside>Partir des mots du client. Huit éléments, quatre familles. Le point clé : les données existent, c’est le rôle de prévenir qui manque. Et « pour démarrer » ouvre la porte à une feuille de route.</aside>
+</section></div></div>
+<div class="frame" id="s3" data-n="3"><div class="scaler"><section id="besoin" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">02 · Le besoin réel</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Deux problèmes, deux destinataires.</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:40px">
+<h3 style="font-size:36px;font-weight:800">Le client final</h3>
+<p style="font-size:28px;line-height:1.4"><b>« Où en est ma commande ? »</b> L’information disponible à tout moment, dans un espace de suivi.</p>
+<p style="font-size:28px;line-height:1.4"><b>« Vous ne m’avez pas prévenu. »</b> Le retard annoncé dès qu’il est certain, une seule fois.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:40px">
+<h3 style="font-size:36px;font-weight:800">Le distributeur</h3>
+<p style="font-size:28px;line-height:1.4"><b>Savoir avant le client.</b> Être alerté tant qu’il reste du temps pour agir auprès du fournisseur.</p>
+<p style="font-size:28px;line-height:1.4"><b>Décider au cas par cas.</b> Le flux alerte, l’équipe choisit, le client reçoit une information juste.</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.45;font-weight:600;max-width:1500px">Le distributeur a déjà toutes les données, mais personne n’est chargé de prévenir. <span style="color:#C2360F">Notre rôle : transformer l’ERP en un système qui prévient chaque client au bon moment, à commencer par les retards.</span></p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">02 / 17</p>
+<aside>Le brief ne parle que des clients. Le fonctionnement actuel révèle un second destinataire : le distributeur lui-même, qui veut être notifié pour décider. Critères de réussite : moins de tickets « où en est ma commande », moins de plaintes, un support libéré.</aside>
+</section></div></div>
+<div class="frame" id="s4" data-n="4"><div class="scaler"><section id="chaine" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">03 · La chaîne de commande</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Une inconnue, puis trois jours fixes.</h2>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:24px">
+<p style="font-size:26px;font-weight:800">Commande</p>
+<p style="font-size:24px;color:#5F6470">date D annoncée</p>
+</div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
+<div style="flex:1.4;display:flex;flex-direction:column;gap:6px;border:2px dashed #5F6470;border-radius:14px;padding:24px">
+<p style="font-size:26px;font-weight:800">Attente fournisseurs</p>
+<p style="font-size:24px;color:#5F6470">durée inconnue</p>
+</div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFE4D9;border:2px solid #FF4D1F;border-radius:14px;padding:24px">
+<p style="font-size:26px;font-weight:800">D − 3</p>
+<p style="font-size:24px;color:#15171C">tout doit être arrivé</p>
+</div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:24px">
+<p style="font-size:26px;font-weight:800">Préparation</p>
+<p style="font-size:24px;color:#5F6470">D − 2 et D − 1</p>
+</div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:24px">
+<p style="font-size:26px;font-weight:800">Livraison</p>
+<p style="font-size:24px;color:#5F6470">J+1, le jour D</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">7h, jour D − 3</h3>
+<p style="font-size:28px;line-height:1.4">Dernier jour possible. Commande incomplète : le distributeur est alerté.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">7h, jour D − 2</h3>
+<p style="font-size:28px;line-height:1.4">Toujours « confirmée » : le retard est certain, quoi qu’il arrive.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">« En retard »</h3>
+<p style="font-size:28px;line-height:1.4">La date annoncée au client est menacée. L’ERP ne connaît pas la date de chaque fournisseur.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">03 / 17</p>
+<aside>2 jours ouvrés de préparation et d’expédition, puis J+1 : 3 jours incompressibles. Les pièces doivent donc être là au plus tard à D − 3. Tous les calculs sont en jours ouvrés (hypothèse à confirmer). Le retard se détecte en une seule lecture de l’ERP : date du jour, statut, date annoncée.</aside>
+</section></div></div>
+<div class="frame" id="s5" data-n="5"><div class="scaler"><section id="methode" data-transition="fade" style="background:#15171C;color:#F2F0EA;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#FF8A66">04 · La méthode</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Tout ce qui peut arriver à une commande, revu un par un.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<p style="font-size:120px;font-weight:800;line-height:1;letter-spacing:-4px;font-variant-numeric:tabular-nums">60</p>
+<p style="font-size:28px;line-height:1.35;color:#A3A7B1">scénarios inventoriés, sur 7 phases</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<p style="font-size:120px;font-weight:800;line-height:1;letter-spacing:-4px;font-variant-numeric:tabular-nums">32</p>
+<p style="font-size:28px;line-height:1.35;color:#A3A7B1">invisibles dans les 6 champs de l’API</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<p style="font-size:120px;font-weight:800;line-height:1;letter-spacing:-4px;font-variant-numeric:tabular-nums">11</p>
+<p style="font-size:28px;line-height:1.35;color:#A3A7B1">cas marginaux, mis de côté et documentés</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<p style="font-size:120px;font-weight:800;line-height:1;letter-spacing:-4px;font-variant-numeric:tabular-nums">9</p>
+<p style="font-size:28px;line-height:1.35;color:#A3A7B1">hypothèses à confirmer avec le distributeur</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.45;color:#F2F0EA;max-width:1500px">Énoncé du test et pratiques de gestion des reliquats et des incidents de livraison, puis une revue phase par phase : <span style="color:#FF8A66">retenu dans le flux, déplacé, marginal ou évolution</span>.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#A3A7B1">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A3A7B1">04 / 17</p>
+<aside>Les phases : commande, approvisionnement, décision interne, préparation, transport, réception, données et notifications. Plus de la moitié des scénarios échappent à l’ERP : le flux ne peut pas tout détecter seul, d’où les alertes au distributeur et les évolutions ERP proposées.</aside>
+</section></div></div>
+<div class="frame" id="s6" data-n="6"><div class="scaler"><section id="phase1" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">05 · Phase 1 · Commande confirmée</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Toutes les commandes, dès leur confirmation.</h2>
+</div>
+<table style="width:100%;font-family:'Sora', Arial, sans-serif;font-size:26px;color:#15171C;border-collapse:collapse">
+<tr><th style="width:8%;text-align:left">#</th><th style="width:36%;text-align:left">Scénario</th><th style="width:56%;text-align:left">Ce que fait le flux</th></tr>
+<tr><td>1.1</td><td>Commande confirmée, date prévisionnelle annoncée</td><td>Référence de tous les calculs. Espace de suivi ouvert.</td></tr>
+<tr><td>1.2</td><td>Le client annule avant expédition</td><td>Hors flux : pas de statut « annulée » dans l’ERP, évolution proposée.</td></tr>
+<tr><td>1.3</td><td>Plusieurs commandes pour un même contact</td><td>Un email par commande. Un espace de suivi par email de contact.</td></tr>
+</table>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Prérequis</h3>
+<p style="font-size:26px;line-height:1.4">Le distributeur envoie lui-même la confirmation de commande. Nous gérons l’état.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Périmètre</h3>
+<p style="font-size:26px;line-height:1.4">Toutes les commandes non livrées, quelle que soit leur ancienneté.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;border-top:2px solid #15171C;padding:18px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Rythme de 7h</h3>
+<p style="font-size:26px;line-height:1.4">Un changement est vu au passage suivant, jusqu’à 24h après. Sans gravité.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">05 / 17</p>
+<aside>Une commande peut sauter une étape entre deux passages (confirmée à 8h, en préparation à 10h) : sans gravité, l’espace de suivi est mis à jour le lendemain. L’espace de suivi est propre à chaque email de contact : deux acheteurs d’une même entreprise ne voient pas les commandes l’un de l’autre. Le changement de contact sur une commande est prévu.</aside>
+</section></div></div>
+<div class="frame" id="s7" data-n="7"><div class="scaler"><section id="appro" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">06 · Phase 2 · Approvisionnement</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Le distributeur sait avant le client.</h2>
+</div>
+<table style="width:100%;font-family:'Sora', Arial, sans-serif;font-size:25px;color:#15171C;border-collapse:collapse">
+<tr><th style="width:32%;text-align:left">Situation à 7h</th><th style="width:32%;text-align:left">Distributeur</th><th style="width:36%;text-align:left">Client</th></tr>
+<tr><td>D − 3 · pièces manquantes</td><td>« Risque de retard » (réglable D − 4, D − 5)</td><td>Rien : le retard n’est pas certain</td></tr>
+<tr style="background:#FFFDF8"><td>D − 2 · nouvelle date saisie (cas 1)</td><td>Rien de plus</td><td>Nouvelle date, message selon le palier</td></tr>
+<tr><td>D − 2 · décision en cours (cas 2)</td><td>Alerte chaque matin</td><td>Rien tant que rien n’est décidé</td></tr>
+<tr style="background:#FFE4D9"><td>D − 2 · rien n’a été fait (cas 3)</td><td>« Problème non résolu »</td><td>« Retard, nous traitons, contactez le support »</td></tr>
+<tr><td>Rupture sans remplacement</td><td>Gestion directe avec le client</td><td>Pas de message automatique</td></tr>
+</table>
+<p style="font-size:26px;line-height:1.45;color:#5F6470;max-width:1600px">L’alerte donne le n° de commande, le client et la date annoncée. Les pièces et les fournisseurs en cause se cherchent dans l’ERP : il ne les expose pas.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">06 / 17</p>
+<aside>Les cas du distributeur : 1, retard avec nouvelle date ; 2, article non livrable, décision en cours avec le client ; 3, retard long. Le retard en cascade (la nouvelle date fournisseur n’est pas tenue) est détecté de la même façon, à partir de la nouvelle date. Faux retard (pièces arrivées mais non saisies) : l’alerte interne permet de le repérer. Tant qu’aucune décision n’est prise, la commande reste « confirmée », jamais « en préparation ».</aside>
+</section></div></div>
+<div class="frame" id="s8" data-n="8"><div class="scaler"><section id="paliers" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">07 · Les retards</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Un message à la mesure du retard.</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">1 à 3 jours ouvrés</p>
+<p style="font-size:26px;line-height:1.4">Excuses, nouvelle date, espace de suivi mis à jour.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">4 jours ouvrés ou plus</p>
+<p style="font-size:26px;line-height:1.4">Message défini avec le distributeur : geste, remise. Jamais d’annulation proposée d’office.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">2e retard et suivants</p>
+<p style="font-size:26px;line-height:1.4">Nouvelles excuses, nouvelle date, geste cumulable. Alerte interne « 2e retard ».</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#15171C;color:#F2F0EA;border-radius:16px;padding:36px 40px">
+<h3 style="font-size:32px;font-weight:800">Aucune date à donner ?</h3>
+<p style="font-size:26px;line-height:1.45;color:#F2F0EA">On ne vide jamais la date dans l’ERP. L’espace de suivi affiche « nouvelle date en cours de confirmation », l’équipe est alertée chaque matin. Pas de date provisoire : elle créerait un retard en cascade.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">07 / 17</p>
+<aside>Retard = nouvelle date moins ancienne date, en jours ouvrés. L’ERP ne garde que la date actuelle : le flux mémorise les dates précédentes et le nombre de glissements. Paliers, messages et gestes commerciaux (montants, plafonds, cumul) sont réglables par le distributeur : le flux applique la règle, il ne la décide pas.</aside>
+</section></div></div>
+<div class="frame" id="s9" data-n="9"><div class="scaler"><section id="decision" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">08 · La décision reste humaine</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Le flux alerte, l’équipe décide.</h2>
+</div>
+<div style="display:flex;gap:14px;align-items:center">
+<div style="flex:1;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Alerte interne</p></div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:40px;height:22px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Fournisseur interrogé</p></div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:40px;height:22px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Décision prise</p></div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:40px;height:22px"></x-shape>
+<div style="flex:1;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">ERP mis à jour</p></div>
+<x-shape kind="arrow-right" style="background:#5F6470;width:40px;height:22px"></x-shape>
+<div style="flex:1;background:#FFE4D9;border:2px solid #FF4D1F;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Client notifié</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:30px;line-height:1.4;font-weight:600">Le point dur : une commande en cours de traitement et une commande oubliée sont identiques dans l’ERP.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Option 1 · ERP</h3>
+<p style="font-size:25px;line-height:1.4">Un indicateur « en attente de décision ». La plus propre.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #15171C;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Option 2 · Règle d’usage</h3>
+<p style="font-size:25px;line-height:1.4">Une date provisoire saisie. Risque de retards en cascade.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #FF4D1F;padding:16px 0 0">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Option 3 · Retenue pour la démo</h3>
+<p style="font-size:25px;line-height:1.4">Le message part : il reste vrai dans les deux cas.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">08 / 17</p>
+<aside>Les options du distributeur : attendre, autre fournisseur, substitut, retrait d’article, livraison en deux temps (non gérée par l’ERP aujourd’hui). Le client ne répond pas à une proposition : les notifications normales continuent, le support met à jour. Une décision qui change en cours de route est un changement de date de plus : couvert, avec un risque de messages rapprochés.</aside>
+</section></div></div>
+<div class="frame" id="s10" data-n="10"><div class="scaler"><section id="aval" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">09 · Préparation, transport, livraison</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Un statut qui ne bouge plus est un signal.</h2>
+</div>
+<table style="width:100%;font-family:'Sora', Arial, sans-serif;font-size:25px;color:#15171C;border-collapse:collapse">
+<tr><th style="width:30%;text-align:left">Situation à 7h</th><th style="width:28%;text-align:left">Distributeur</th><th style="width:42%;text-align:left">Client</th></tr>
+<tr><td>En préparation depuis plus de 2 jours ouvrés</td><td>« Délai de préparation dépassé »</td><td>Rien</td></tr>
+<tr style="background:#FFE4D9"><td>Jour D, encore en préparation</td><td>Alerte</td><td>« Risque de retard, nous traitons, contactez le service client »</td></tr>
+<tr><td>D + 1, encore expédiée</td><td>« Livraison non confirmée »</td><td>Rien</td></tr>
+<tr style="background:#FFE4D9"><td>D + 2, toujours pas livrée</td><td>Alerte</td><td>« Livraison semble retardée, contactez le support si non reçue »</td></tr>
+<tr><td>Passage en livrée</td><td>Rien</td><td>« Livrée hier », ou « livrée, avec nos excuses » si en retard</td></tr>
+<tr><td>Passage en expédiée</td><td>Rien</td><td>Pas d’email : l’espace de suivi suffit</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">09 / 17</p>
+<aside>L’expédition a lieu pendant la journée D − 1 : un dépassement ne se voit qu’à 7h le jour D. Le message « risque » est assumé même si c’est un oubli de saisie : il est prudent et vrai. Échec de livraison, casse, perte, refus : invisibles dans l’ERP, le statut reste « expédiée » ; seule la durée les trahit. Le message « livrée » inclut toujours une ligne vers le support, au cas où le client n’aurait rien reçu.</aside>
+</section></div></div>
+<div class="frame" id="s11" data-n="11"><div class="scaler"><section id="parcours" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">10 · Le parcours, vu des deux côtés</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Sans incident, deux emails.</h2>
+</div>
+<table style="width:100%;font-family:'Sora', Arial, sans-serif;font-size:24px;color:#15171C;border-collapse:collapse">
+<tr><th style="width:20%;text-align:left">Qui reçoit quoi</th><th style="width:14%;text-align:left">Confirmée</th><th style="width:16%;text-align:left">D − 3</th><th style="width:20%;text-align:left">D − 2</th><th style="width:14%;text-align:left">Expédiée</th><th style="width:16%;text-align:left">Livrée</th></tr>
+<tr style="background:#FFFDF8"><td><b>Normale · client</b></td><td>Email de suivi + lien</td><td>–</td><td>–</td><td>Espace de suivi</td><td>Email « livrée »</td></tr>
+<tr><td><b>Normale · équipe</b></td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+<tr style="background:#FFE4D9"><td><b>En retard · client</b></td><td>Email de suivi + lien</td><td>–</td><td>Nouvelle date, ou « retard, nous traitons »</td><td>Espace de suivi</td><td>« Livrée, avec nos excuses »</td></tr>
+<tr style="background:#FFE4D9"><td><b>En retard · équipe</b></td><td>–</td><td>« Risque de retard »</td><td>Alerte chaque matin jusqu’à la décision</td><td>–</td><td>–</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.45;max-width:1500px">Le client n’est sollicité que lorsqu’une information change quelque chose pour lui. <span style="color:#C2360F">L’équipe n’est sollicitée que lorsqu’une décision lui revient.</span></p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">10 / 17</p>
+<aside>Slide clé. Lire la ligne « normale · client » : le lendemain de la confirmation, à 7h, un email de suivi avec le lien vers l’espace ; la commande se suit ensuite seule, un email à la livraison. Le distributeur garde son propre email de confirmation. Puis la commande en retard : l’équipe est prévenue un jour avant le client, et chaque message client porte une information nouvelle. Une commande découverte déjà en retard reçoit un seul email : celui de suivi, qui annonce le retard.</aside>
+</section></div></div>
+<div class="frame" id="s12" data-n="12"><div class="scaler"><section id="alertes" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">11 · Les alertes internes</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Un seul récapitulatif par jour.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px 56px">
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Risque de retard</b> · D − 3, pièces manquantes</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Problème non résolu</b> · D − 2, client notifié</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Délai de préparation dépassé</b> · plus de 2 j.o.</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Date compromise</b> · jour D, en préparation</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Livraison non confirmée</b> · D + 1</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>2e, 3e retard</b> · démarche personnalisée</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Email non délivré</b> · contact à corriger</p>
+<p style="font-size:26px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>Statut inconnu</b> · annulée, litige</p>
+</div>
+<div style="display:flex;gap:24px">
+<p style="flex:1;font-size:26px;line-height:1.4;background:#15171C;color:#F2F0EA;border-radius:12px;padding:22px 26px">Répétée chaque jour tant que rien n’est résolu.</p>
+<p style="flex:1;font-size:26px;line-height:1.4;background:#15171C;color:#F2F0EA;border-radius:12px;padding:22px 26px">Pas d’escalade par défaut, sur demande seulement.</p>
+<p style="flex:1;font-size:26px;line-height:1.4;background:#15171C;color:#F2F0EA;border-radius:12px;padding:22px 26px">7 jours sur 7 : le week-end se lit le lundi.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">11 / 17</p>
+<aside>Une alerte par commande et par jour, en emails séparés, ce serait des dizaines de messages : l’équipe cesserait de les lire. Le récapitulatif quotidien les regroupe par type et par urgence, avec pour chaque commande : client, date annoncée, retard, client déjà prévenu ou non.</aside>
+</section></div></div>
+<div class="frame" id="s13" data-n="13"><div class="scaler"><section id="archi" data-transition="fade" style="background:#15171C;color:#F2F0EA;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#FF8A66">12 · L’architecture n8n</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Un flux simple, une mémoire au centre.</h2>
+</div>
+<div style="display:flex;gap:14px;align-items:center">
+<div style="flex:1;border:1px solid #3A3F49;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">7h, 7 jours sur 7</p></div>
+<x-shape kind="arrow-right" style="background:#A3A7B1;width:40px;height:22px"></x-shape>
+<div style="flex:1;border:1px solid #3A3F49;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Lecture de l’ERP</p></div>
+<x-shape kind="arrow-right" style="background:#A3A7B1;width:40px;height:22px"></x-shape>
+<div style="flex:1.2;background:#FF5A2C;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:800;color:#15171C">Comparaison à la mémoire</p></div>
+<x-shape kind="arrow-right" style="background:#A3A7B1;width:40px;height:22px"></x-shape>
+<div style="flex:1;border:1px solid #3A3F49;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Règles</p></div>
+<x-shape kind="arrow-right" style="background:#A3A7B1;width:40px;height:22px"></x-shape>
+<div style="flex:1.3;border:1px solid #3A3F49;border-radius:14px;padding:22px"><p style="font-size:25px;font-weight:600">Emails, récap, espace de suivi</p></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#FF8A66">Ce que la mémoire retient</h3>
+<ul style="font-size:26px;line-height:1.5;color:#F2F0EA">
+<li>Statut et jour de sa première observation</li>
+<li>Dates annoncées successives</li>
+<li>Nombre et durée des retards</li>
+<li>Messages déjà envoyés</li>
+</ul>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#FF8A66">Garde-fous</h3>
+<ul style="font-size:26px;line-height:1.5;color:#F2F0EA">
+<li>Simulation par défaut, rien ne part</li>
+<li>Un message par événement, jamais deux</li>
+<li>Passage échoué : alerte prestataire et distributeur</li>
+<li>Seuils, paliers et messages réglables</li>
+</ul>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#A3A7B1">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A3A7B1">12 / 17</p>
+<aside>L’API ne date pas les changements de statut et ne garde que la date actuelle. Sans mémoire, impossible de mesurer un retard, de détecter une nouvelle date ou d’éviter les doublons. Envoi par SendGrid, domaine du distributeur à authentifier en production. L’espace de suivi est servi par n8n : un lien par email de contact.</aside>
+</section></div></div>
+<div class="frame" id="s14" data-n="14"><div class="scaler"><section id="validation" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">13 · Valider avant d’envoyer</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Quatre marches avant le premier email client.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:30px">
+<p style="font-size:64px;font-weight:800;line-height:1;color:#FF4D1F">1</p>
+<h3 style="font-size:28px;font-weight:800">Simulation</h3>
+<p style="font-size:25px;line-height:1.4">« Qui recevrait quoi » sur les 30 dernières commandes. Rien ne part.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:30px">
+<p style="font-size:64px;font-weight:800;line-height:1;color:#FF4D1F">2</p>
+<h3 style="font-size:28px;font-weight:800">Validation</h3>
+<p style="font-size:25px;line-height:1.4">Le distributeur valide règles, seuils et messages.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:30px">
+<p style="font-size:64px;font-weight:800;line-height:1;color:#FF4D1F">3</p>
+<h3 style="font-size:28px;font-weight:800">Premier passage</h3>
+<p style="font-size:25px;line-height:1.4">Alertes internes seules : l’équipe traite les retards déjà là. Le lien de suivi part ensuite pour les nouvelles commandes.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:30px">
+<p style="font-size:64px;font-weight:800;line-height:1;color:#FF4D1F">4</p>
+<h3 style="font-size:28px;font-weight:800">Envois clients</h3>
+<p style="font-size:25px;line-height:1.4">SendGrid branché, domaine authentifié.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.45;max-width:1560px">À 50 commandes par semaine, les 30 dernières représentent environ <b>3 jours d’activité</b> : peu de retards visibles. Le jeu de démo, lui, couvre tous les cas.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">13 / 17</p>
+<aside>Au premier passage réel, le flux ne sait pas ce que le support a déjà dit aux clients : on ne leur écrit pas, on liste les retards existants pour l’équipe. C’est la mise à jour de l’ERP par l’équipe qui déclenche ensuite les messages clients.</aside>
+</section></div></div>
+<div class="frame" id="s15" data-n="15"><div class="scaler"><section id="hypotheses" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">14 · Hypothèses à confirmer</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Neuf réglages à valider avec le distributeur.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 56px">
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>1 ·</b> Calculs en jours ouvrés, livraison comprise (week-ends et fériés exclus)</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>2 ·</b> Pièces au plus tard à D − 3 ; le jour d’arrivée ne compte pas</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>3 ·</b> Passage tous les jours à 7h, envois compris le week-end</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>4 ·</b> Paliers de retard : 1 à 3 jours, 4 jours ou plus</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>5 ·</b> Alerte « risque de retard » à D − 3, réglable</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>6 ·</b> Message de retard même si l’équipe traite déjà (option 3)</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>7 ·</b> Pas d’escalade automatique des alertes internes</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>8 ·</b> Confirmation envoyée par le distributeur ; lien de suivi envoyé par le flux le lendemain à 7h</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>9 ·</b> Périmètre : toutes les commandes non livrées</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">14 / 17</p>
+<aside>Chaque hypothèse est un réglage du flux, pas une règle en dur : la changer ne demande pas de reconstruire le workflow. À trancher aussi : le contenu des messages à partir de 4 jours de retard, les gestes commerciaux (montants, plafonds, cumul), et lequel des messages de sécurité prime s’ils tombent le même jour.</aside>
+</section></div></div>
+<div class="frame" id="s16" data-n="16"><div class="scaler"><section id="evolutions" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">15 · Évolutions proposées</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Ce que l’ERP ne sait pas dire limite le flux.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:56px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Côté ERP</h3>
+<ul style="font-size:26px;line-height:1.55">
+<li>Statut « annulée »</li>
+<li>Indicateur « en attente de décision »</li>
+<li>Fournisseur et date attendue, par article</li>
+<li>Expédition en plusieurs envois</li>
+<li>Suivi transporteur (n° et événements)</li>
+</ul>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">Côté service</h3>
+<ul style="font-size:26px;line-height:1.55">
+<li>Agent IA dans le chat support : il répond seul aux « où en est ma commande »</li>
+<li>Espace de suivi complet, connexion par lien</li>
+<li>SMS, au choix du client</li>
+<li>Email d’expédition et escalade, sur demande</li>
+</ul>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.45;max-width:1560px"><b>Le bonus :</b> le flux mesure pour la première fois les retards. Avec le fournisseur dans l’ERP, il devient un outil de pilotage des achats.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">15 / 17</p>
+<aside>La date attendue par fournisseur permettrait d’alerter bien avant D − 3. L’agent IA dans Crisp, Intercom ou Zendesk lit les mêmes données que les emails : le client entend la même chose partout. C’est le cœur de métier Qwokka, et la suite naturelle du projet.</aside>
+</section></div></div>
+<div class="frame" id="s17" data-n="17"><div class="scaler"><section id="marginaux" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">16 · Scénarios mis de côté</p>
+<h2 style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1.05">Onze cas marginaux, assumés.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 40px">
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Date intenable dès la commande</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Date annoncée un jour non ouvré</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Commande modifiée par le client</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Blocage administratif (paiement, encours)</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Commande urgente, client prioritaire</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Annulation d’un seul article</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Livraison très lointaine (précommande)</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Commande entièrement en stock</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Commande passée deux fois</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Retour en arrière de statut</p>
+<p style="font-size:25px;line-height:1.35;border-top:1px solid #DCD8CF;padding:14px 0 0">Administrateur qui voit toute l’entreprise</p>
+</div>
+<p style="font-size:28px;line-height:1.45;max-width:1560px">Hors énoncé ou trop rares pour une v1. Documentés, ils seront traités à la demande, <span style="color:#C2360F">sans reconstruire le flux</span>.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">16 / 17</p>
+<aside>Chaque cas a été examiné puis écarté pour une raison : non prévu par l’énoncé, ou relevant de la validation de commande côté distributeur. Les garder visibles montre que le périmètre est un choix, pas un oubli.</aside>
+</section></div></div>
+<div class="frame" id="s18" data-n="18"><div class="scaler"><section id="suite" data-transition="fade" style="background:#15171C;color:#F2F0EA;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#FF8A66">17 · La suite</p>
+<h1 style="font-size:120px;font-weight:800;letter-spacing:-4px;line-height:1">Place à la démo.</h1>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<h3 style="font-size:30px;font-weight:800">En direct</h3>
+<p style="font-size:26px;line-height:1.45;color:#A3A7B1">30 commandes, le flux n8n, les emails réels, l’espace de suivi client.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<h3 style="font-size:30px;font-weight:800">Du distributeur</h3>
+<p style="font-size:26px;line-height:1.45;color:#A3A7B1">Les 9 hypothèses confirmées, les messages validés, l’accès SendGrid.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:2px solid #FF5A2C;padding:20px 0 0">
+<h3 style="font-size:30px;font-weight:800">Ensuite</h3>
+<p style="font-size:26px;line-height:1.45;color:#A3A7B1">Mise en service en 4 marches, puis les évolutions par ordre de valeur.</p>
+</div>
+</div>
+<p style="position:absolute;left:120px;bottom:92px;width:320px;font-family:'Permanent Marker', 'Brush Script MT', cursive;font-size:44px;line-height:1;color:#FF5A2C;transform:rotate(-7deg)">Growth</p>
+<p style="position:absolute;left:128px;bottom:52px;width:600px;font-size:30px;font-weight:800;letter-spacing:8px;line-height:1">EX MACHINA</p>
+<p style="position:absolute;right:128px;bottom:56px;width:700px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A3A7B1">Gabriel Videira</p>
+<aside>Enchaîner sur la démo : le rapport « qui recevrait quoi », une exécution du flux avec emails reçus en direct, l’espace de suivi d’un client, puis le changement d’un réglage pour montrer que tout est paramétrable.</aside>
+</section></div></div>
+<div class="frame" id="s19" data-n="19"><div class="scaler"><section id="annexe-index" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Inventaire des scénarios</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">60 scénarios, 7 phases, 32 invisibles.</h2>
+</div>
+<table style="width:100%;font-family:'Sora', Arial, sans-serif;font-size:26px;color:#15171C;border-collapse:collapse"><tr><th style="width:7%;text-align:left">Phase</th><th style="width:33%;text-align:left">Ce qui se passe</th><th style="width:24%;text-align:left">Statut ERP</th><th style="width:9%;text-align:right">Total</th><th style="width:9%;text-align:right">Visibles</th><th style="width:9%;text-align:right">Partiels</th><th style="width:9%;text-align:right">Invisibles</th></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>A</b></td><td>Commande et promesse</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">Commande_confirmee</td><td style="text-align:right">9</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right;color:#C2360F"><b>3</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>B</b></td><td>Approvisionnement fournisseurs</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">Commande_confirmee</td><td style="text-align:right">14</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right;color:#C2360F"><b>8</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>C</b></td><td>Décision interne</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">aucun statut</td><td style="text-align:right">10</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right;color:#C2360F"><b>9</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>D</b></td><td>Préparation et expédition</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">En_preparation</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right;color:#C2360F"><b>2</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>E</b></td><td>Transport</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">Expediee</td><td style="text-align:right">10</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right;color:#C2360F"><b>6</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>F</b></td><td>Réception</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">Livree</td><td style="text-align:right">4</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right;color:#C2360F"><b>2</b></td></tr><tr><td style="font-family:'JetBrains Mono', 'Courier New', monospace"><b>G</b></td><td>Données et notifications</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#5F6470">transverse</td><td style="text-align:right">7</td><td style="text-align:right">4</td><td style="text-align:right">1</td><td style="text-align:right;color:#C2360F"><b>2</b></td></tr><tr style="background:#FFE4D9"><td></td><td><b>Ensemble</b></td><td></td><td style="text-align:right"><b>60</b></td><td style="text-align:right"><b>19</b></td><td style="text-align:right"><b>9</b></td><td style="text-align:right;color:#C2360F"><b>32</b></td></tr></table>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A1 / A8</p>
+<aside>Index de l’inventaire complet. Chaque phase est détaillée dans les annexes suivantes, scénario par scénario, avec sa visibilité dans les 6 champs de l’API. Visible : le flux le détecte. Partiel : il en voit un effet indirect, en général la durée. Invisible : rien dans les données ; il passe par l’équipe, ou par une évolution de l’ERP.</aside>
+</section></div></div>
+<div class="frame" id="s20" data-n="20"><div class="scaler"><section id="annexe-a" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phase A · Commande_confirmee · 9 scénarios · 3 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">A · Commande et promesse</h2>
+</div>
+<div style="display:flex;gap:32px"><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Commande standard, date annoncée tenable</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Date annoncée intenable dès la commande (moins de 3 j.o. plus le délai fournisseur)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Date annoncée tombant un jour non ouvré (week-end, férié, fermeture)</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client modifie sa commande après confirmation (articles, quantités, adresse, date souhaitée)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client annule avant expédition</p></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Commande bloquée côté distributeur (paiement, encours, validation interne)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A7</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Commande urgente ou client prioritaire (chantier daté, grand compte)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A8</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Données erronées (email invalide, date vide, doublon de numéro)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">A9</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Plusieurs commandes en cours pour un même client</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A2 / A8</p>
+<aside>Le client commande, une date de livraison lui est annoncée. 5 visibles, 1 partiels, 3 invisibles.</aside>
+</section></div></div>
+<div class="frame" id="s21" data-n="21"><div class="scaler"><section id="annexe-b" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phase B · Commande_confirmee · 14 scénarios · 8 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">B · Approvisionnement fournisseurs</h2>
+</div>
+<div style="display:flex;gap:32px"><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Tous les fournisseurs livrent avant la date limite</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Un fournisseur en retard, mais qui rattrape avant la date limite</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Retard court : la date client glisse de quelques jours (cas 1)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Retard long : la date client glisse au-delà du seuil (cas 3)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Fournisseur sans visibilité : il ne répond pas ou ne donne pas de date</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le fournisseur communique une nouvelle date de livraison</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B7</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Rupture définitive : article arrêté, fournisseur défaillant (cas 2)</p></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B8</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison fournisseur incomplète en quantité</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B9</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison fournisseur non conforme (mauvaise référence, défaut, casse)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B10</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Plusieurs fournisseurs en retard sur la même commande</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B11</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Un même fournisseur en retard sur plusieurs commandes (grève, pénurie, faillite)</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B12</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">La nouvelle date du fournisseur est elle-même dépassée (retard en cascade)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B13</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Faux retard : les pièces sont là mais leur réception n&#x27;est pas saisie dans l&#x27;ERP</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">B14</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Commande ancienne bloquée depuis des semaines, hors du lot des commandes récentes</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A3 / A8</p>
+<aside>Chaque fournisseur envoie sa partie ; l&#x27;ERP signale quand tout est arrivé. 5 visibles, 1 partiels, 8 invisibles.</aside>
+</section></div></div>
+<div class="frame" id="s22" data-n="22"><div class="scaler"><section id="annexe-c" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phase C · aucun statut · 10 scénarios · 9 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">C · Décision interne</h2>
+</div>
+<div style="display:flex;gap:32px"><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Alerte traitée, décision prise dans le délai</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Alerte non lue ou non traitée (absence, surcharge, mauvais destinataire)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">La décision demande l&#x27;accord du client (expédition partielle, substitut, retrait d&#x27;article)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client accepte la proposition</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client refuse (veut tout à la date, ou annule)</p></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client ne répond pas dans le délai</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C7</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Décision prise mais ERP non mis à jour : le client n&#x27;est pas informé</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C8</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">La décision change en cours de route</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C9</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Nouveau fournisseur : nouveau délai, nouveau risque de retard</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">C10</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">La solution a un coût à arbitrer (double transport, article plus cher, geste commercial)</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A4 / A8</p>
+<aside>En parallèle de l&#x27;attente : le distributeur se renseigne, choisit une option, met l&#x27;ERP à jour. 0 visibles, 1 partiels, 9 invisibles.</aside>
+</section></div></div>
+<div class="frame" id="s23" data-n="23"><div class="scaler"><section id="annexe-d" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phase D · En_preparation · 6 scénarios · 2 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">D · Préparation et expédition</h2>
+</div>
+<div style="display:flex;gap:32px"><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Préparation en 2 j.o.</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Préparation plus longue (charge, absence, inventaire)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Pièce endommagée ou manquante découverte pendant la préparation</p></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Préparation dans les temps, mais pièces arrivées tard : la date glisse</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Expédition partielle décidée, reliquat en attente</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">D6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Retour en arrière de statut (Expediee → En_preparation)</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A5 / A8</p>
+<aside>Tout est arrivé : 2 jours ouvrés pour préparer et expédier. 2 visibles, 2 partiels, 2 invisibles.</aside>
+</section></div></div>
+<div class="frame" id="s24" data-n="24"><div class="scaler"><section id="annexe-e" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phase E · Expediee · 10 scénarios · 6 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">E · Transport</h2>
+</div>
+<div style="display:flex;gap:32px"><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison à J+1</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Retard transporteur (surcharge, intempéries, grève)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Échec de livraison : destinataire absent, chantier fermé, accès impossible</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Adresse erronée ou incomplète</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Colis endommagé en transit</p></div></div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Colis perdu</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E7</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison refusée par le client</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E8</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Retour à l&#x27;expéditeur</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E9</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison en plusieurs colis, l&#x27;un d&#x27;eux manque</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">E10</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Commande livrée, mais statut « Livree » jamais mis à jour</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A6 / A8</p>
+<aside>Remise au transporteur, livraison à J+1. 1 visibles, 3 partiels, 6 invisibles.</aside>
+</section></div></div>
+<div class="frame" id="s25" data-n="25"><div class="scaler"><section id="annexe-fg" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Phases F et G · 11 scénarios · 4 invisibles</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">F · Réception · G · Données et notifications</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px"><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:30px;font-weight:800">F · Réception <span style="color:#5F6470">· Livree</span></h3><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">F1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livraison conforme</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">F2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Réserves à la réception : manquant, casse, erreur d&#x27;article</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">F3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Livrée en retard : insatisfaction après coup</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">F4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Statut « Livree » erroné : le client dit ne rien avoir reçu</p></div></div><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:30px;font-weight:800">G · Données et notifications <span style="color:#5F6470">· transverse</span></h3><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Statut hors de la liste prévue (annulée, en litige, en attente de paiement)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Date annoncée modifiée dans l&#x27;ERP (ré-annonce par le support)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G3</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le traitement du matin n&#x27;a pas tourné</p></div><div style="display:flex;gap:20px;border-left:8px solid #F2B79F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G4</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#8E4A2E">Partiel</p></div><p style="flex:1;font-size:24px;line-height:1.3">Email non délivré (adresse invalide, boîte pleine, spam)</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G5</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Le client répond à la notification ou appelle malgré tout</p></div><div style="display:flex;gap:20px;border-left:8px solid #FF4D1F;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G6</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#C2360F">Invisible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Mauvais destinataire (contact parti, acheteur différent du chef de chantier)</p></div><div style="display:flex;gap:20px;border-left:8px solid #15171C;background:#FFFDF8;padding:6px 18px"><div style="width:150px;display:flex;flex-direction:column;gap:2px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500">G7</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">Visible</p></div><p style="flex:1;font-size:24px;line-height:1.3">Plusieurs notifications le même jour pour un même client</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A7 / A8</p>
+<aside>La commande est chez le client. Ce qui peut dérailler dans l&#x27;information elle-même.</aside>
+</section></div></div>
+<div class="frame" id="s26" data-n="26"><div class="scaler"><section id="annexe-invisibles" data-transition="fade" style="background:#F7F5F0;color:#15171C;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">Annexe · Les angles morts de l’ERP</p>
+<h2 style="font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05">32 scénarios invisibles pour l’ERP.</h2>
+</div>
+<p style="font-size:28px;line-height:1.4;max-width:1560px">Rien dans les 6 champs de l’API ne les signale : le flux ne peut pas les détecter seul. <span style="color:#C2360F">Ils passent par l’équipe, ou par une évolution de l’ERP.</span></p><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px"><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">A5</p><p style="flex:1;font-size:24px;line-height:1.3">Annulation avant expédition</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">A6</p><p style="flex:1;font-size:24px;line-height:1.3">Blocage administratif</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">A7</p><p style="flex:1;font-size:24px;line-height:1.3">Commande urgente, prioritaire</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B5</p><p style="flex:1;font-size:24px;line-height:1.3">Fournisseur sans visibilité</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B6</p><p style="flex:1;font-size:24px;line-height:1.3">Nouvelle date fournisseur</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B7</p><p style="flex:1;font-size:24px;line-height:1.3">Rupture définitive (cas 2)</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B8</p><p style="flex:1;font-size:24px;line-height:1.3">Livraison fournisseur incomplète</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B9</p><p style="flex:1;font-size:24px;line-height:1.3">Livraison non conforme</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B10</p><p style="flex:1;font-size:24px;line-height:1.3">Plusieurs fournisseurs en retard</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B11</p><p style="flex:1;font-size:24px;line-height:1.3">Un fournisseur en retard partout</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">B13</p><p style="flex:1;font-size:24px;line-height:1.3">Pièces reçues, non saisies</p></div></div><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C1</p><p style="flex:1;font-size:24px;line-height:1.3">Décision prise dans le délai</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C2</p><p style="flex:1;font-size:24px;line-height:1.3">Alerte non traitée</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C3</p><p style="flex:1;font-size:24px;line-height:1.3">Accord du client nécessaire</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C4</p><p style="flex:1;font-size:24px;line-height:1.3">Le client accepte</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C5</p><p style="flex:1;font-size:24px;line-height:1.3">Le client refuse</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C6</p><p style="flex:1;font-size:24px;line-height:1.3">Le client ne répond pas</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C7</p><p style="flex:1;font-size:24px;line-height:1.3">Décision non saisie dans l’ERP</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C9</p><p style="flex:1;font-size:24px;line-height:1.3">Nouveau fournisseur, nouveau délai</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">C10</p><p style="flex:1;font-size:24px;line-height:1.3">Coût à arbitrer</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">D3</p><p style="flex:1;font-size:24px;line-height:1.3">Pièce abîmée en préparation</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">D5</p><p style="flex:1;font-size:24px;line-height:1.3">Expédition partielle, reliquat</p></div></div><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E3</p><p style="flex:1;font-size:24px;line-height:1.3">Échec de livraison</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E4</p><p style="flex:1;font-size:24px;line-height:1.3">Adresse erronée</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E5</p><p style="flex:1;font-size:24px;line-height:1.3">Colis endommagé</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E7</p><p style="flex:1;font-size:24px;line-height:1.3">Livraison refusée</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E8</p><p style="flex:1;font-size:24px;line-height:1.3">Retour à l’expéditeur</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">E9</p><p style="flex:1;font-size:24px;line-height:1.3">Un colis manque</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">F2</p><p style="flex:1;font-size:24px;line-height:1.3">Réserves à la réception</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">F4</p><p style="flex:1;font-size:24px;line-height:1.3">« Livrée » mais rien reçu</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">G5</p><p style="flex:1;font-size:24px;line-height:1.3">Le client répond ou appelle</p></div><div style="display:flex;gap:16px;border-left:6px solid #FF4D1F;padding:4px 0 4px 16px"><p style="width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#C2360F">G6</p><p style="flex:1;font-size:24px;line-height:1.3">Mauvais destinataire</p></div></div></div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA · ANNEXE</p>
+<p style="position:absolute;right:128px;bottom:64px;width:260px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">A8 / A8</p>
+<aside>Par phase : commande 3, approvisionnement 8, décision interne 9, préparation 2, transport 6, réception 2, données et notifications 2. Les évolutions ERP proposées en rendent une partie visible : statut « annulée » (A5), indicateur « en attente de décision » (C1 à C7), fournisseur et date attendue par article (B5 à B11, C9), expéditions multiples (D5, E9), suivi transporteur (E3 à E8). Les autres relèvent du support humain ou de l’agent IA (C4 à C6, F2, F4, G5, G6).</aside>
+</section></div></div>
+</main>
+<div id="pres" hidden><div class="frame" id="pf"><div class="scaler" id="ps"></div></div><span class="hint">← → pour naviguer · Échap pour quitter</span></div>
+<script>
+(() => {
+  const frames=[...document.querySelectorAll('#list .frame')];
+  frames.forEach(f=>{const a=f.querySelector('aside'); if(a){const n=document.createElement('div');n.className='notes';n.textContent='Notes · '+a.textContent;f.after(n);}});
+  const fit=(f,w)=>{f.querySelector('.scaler').style.transform='scale('+(w/1920)+')';};
+  const ro=new ResizeObserver(es=>es.forEach(e=>fit(e.target,e.contentRect.width)));
+  frames.forEach(f=>ro.observe(f));
+  document.getElementById('notes').onclick=()=>document.body.classList.toggle('show-notes');
+  const pres=document.getElementById('pres'),pf=document.getElementById('pf'),ps=document.getElementById('ps');let cur=0;
+  const size=()=>{const w=Math.min(innerWidth,innerHeight*16/9);pf.style.width=w+'px';pf.style.height=(w*9/16)+'px';ps.style.transform='scale('+(w/1920)+')';};
+  const show=i=>{cur=Math.max(0,Math.min(frames.length-1,i));ps.innerHTML=frames[cur].querySelector('.scaler').innerHTML;};
+  const open=()=>{const vis=frames.findIndex(f=>f.getBoundingClientRect().bottom>80);pres.hidden=false;size();show(vis<0?0:vis);try{pres.requestFullscreen&&pres.requestFullscreen().catch(()=>{})}catch(e){}};
+  const close=()=>{pres.hidden=true;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});frames[cur].scrollIntoView({block:'start'});};
+  document.getElementById('go').onclick=open;
+  pres.onclick=e=>show(cur+(e.clientX<innerWidth/3?-1:1));
+  addEventListener('resize',()=>{if(!pres.hidden)size();});
+  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&!pres.hidden)close();});
+  addEventListener('keydown',e=>{if(pres.hidden)return;if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(cur+1);}else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(cur-1);}else if(e.key==='Escape')close();});
+})();
+</script></body></html>

@@ -1,0 +1,711 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Simulateur de suivi de commande</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@400;500&family=Permanent+Marker&display=swap">
+<style>
+/* Layout : poste de pilotage. Bandeau du jour simulé (date + bouton unique), puis liste des commandes / fiche commande côte à côte, puis les sorties du passage. */
+:root{
+  --bg:#F7F5F0; --surface:#FFFDF8; --fg:#15171C; --muted:#5F6470; --line:#DCD8CF;
+  --accent:#FF4D1F; --accent-ink:#C2360F; --accent-soft:#FFE4D9; --ok:#1F6B3A; --ok-soft:#E3F1E7; --sel:#FFF1EA;
+  --mail-bg:#FFFFFF; --mail-fg:#15171C;
+  --display:"Sora",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; --hand:"Permanent Marker","Brush Script MT",cursive;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171C;--surface:#1E2027;--fg:#F2F0EA;--muted:#A3A7B1;--line:#33363F;--accent:#FF5A2C;--accent-ink:#FF8A66;--accent-soft:#3A2018;--ok:#7FD39B;--ok-soft:#173022;--sel:#2A211D;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15171C;--surface:#1E2027;--fg:#F2F0EA;--muted:#A3A7B1;--line:#33363F;--accent:#FF5A2C;--accent-ink:#FF8A66;--accent-soft:#3A2018;--ok:#7FD39B;--ok-soft:#173022;--sel:#2A211D;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--display);font-size:15px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+.wrap>*{min-width:0}
+h1,h2{margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:clamp(24px,3.4vw,34px);font-weight:800;line-height:1.1}
+h2{font-size:22px;font-weight:800}
+p{margin:0}
+.eyebrow,.lbl{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.lbl{margin-bottom:8px}
+.muted{color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand .g{font-family:var(--hand);color:var(--accent);font-size:22px;transform:rotate(-6deg);display:inline-block}
+.brand .x{font-weight:800;letter-spacing:.3em;font-size:13px}
+.top{display:grid;gap:8px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--fg);color:var(--bg);border-radius:16px;padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.bar .when{display:grid;gap:4px;min-width:0}
+.bar .when small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.bar #date{font-size:clamp(20px,2.6vw,28px);font-weight:800;line-height:1.1}
+.bar #date .muted{color:inherit;opacity:.6;font-weight:400;font-size:.7em}
+.bar .sp{flex:1}
+.bar .btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:8px 14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn:focus-visible,tr[data-n]:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.ghost{background:transparent}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#15171C;font-weight:800;padding:10px 18px}
+.bar .btn.ghost{color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent)}
+.chip{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:2px 8px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.wait{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.chip.mail{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip.al{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.chip.s-En_preparation{border-color:var(--fg)}
+.chip.s-Expediee{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip.s-Livree{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.s-Annulee{border-style:dashed}
+.main{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-top:1px solid var(--line);vertical-align:top}
+tr[data-n]{cursor:pointer}
+tr[data-n]:hover{background:var(--bg)}
+tr.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--accent)}
+td .co{font-family:var(--display);font-size:13px}
+td.ev{display:flex;flex-wrap:wrap;gap:4px;font-size:13px}
+.empty{color:var(--muted);padding:20px 4px}
+.dh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.facts .wide{grid-column:1/-1}
+@media (max-width:560px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+dd{margin:2px 0 0;font-weight:600;display:flex;flex-wrap:wrap;gap:4px}
+.actions{border-top:1px solid var(--line);padding-top:14px;display:grid;gap:10px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+input{font:inherit;width:72px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.journal{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;display:grid;gap:12px}
+.day{display:grid;gap:6px}
+.dayh{font-weight:800;font-size:14px}
+.ent{display:flex;gap:10px;font-size:14px}
+.ent.alerte{color:var(--accent-ink)}
+.mk{width:18px;flex:none;text-align:center}
+.mail{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.mail summary{display:flex;gap:10px;padding:10px 12px;cursor:pointer;list-style:none;font-size:14px}
+.mail summary::-webkit-details-marker{display:none}
+.mail[open] summary{border-bottom:1px solid var(--line)}
+.ms{min-width:0}
+.mailhead{font-family:var(--mono);font-size:12px;color:var(--muted);padding:8px 12px}
+.mailbody{background:var(--mail-bg);color:var(--mail-fg);padding:16px;overflow-x:auto}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
+.cols>div{display:grid;gap:8px;align-content:start;min-width:0}
+.to{font-family:var(--mono);font-size:12px;margin-top:4px}
+form.nc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+form.nc input[type=text],form.nc input[type=email]{width:auto;flex:1 1 160px;min-width:0}
+#espace-wrap{display:grid;gap:10px}
+#espace{width:100%;height:640px;border:1px solid var(--line);border-radius:16px;background:#F7F5F0}
+.envoi{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:14px;border-top:1px solid color-mix(in srgb,var(--bg) 25%,transparent);padding-top:10px}
+.envoi input{width:auto;margin-right:6px;accent-color:var(--accent)}
+#envoi-etat{opacity:.85}
+[hidden]{display:none!important}
+.guide{font-size:14px}
+.guide summary{cursor:pointer;font-weight:600}
+.guide ol{margin:10px 0 0;padding-left:20px;display:grid;gap:4px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="brand"><span class="g">Growth</span><span class="x">EX MACHINA</span><span class="muted">× Qwokka · Distri Pro</span></p>
+    <h1>Simulateur de suivi de commande</h1>
+    <p class="muted" style="max-width:75ch">Les mêmes règles que le workflow n8n, jour après jour. Chaque email et chaque alerte s’affichent ici ; cochez l’envoi réel pour les recevoir aussi dans la boîte de test.</p>
+  </header>
+
+  <div class="bar" role="region" aria-label="Jour simulé">
+    <div class="when"><small>Jour simulé</small><span id="date"></span></div>
+    <div id="etat"></div>
+    <span class="sp"></span>
+    <div class="btns">
+      <button class="btn primary" id="go">Lancer le passage de 7h</button>
+      <button class="btn ghost" id="reset-demo">Rejouer les 30 commandes</button>
+      <button class="btn ghost" id="reset-zero">Partir de zéro</button>
+    </div>
+    <div class="envoi" id="envoi-box" hidden><label><input type="checkbox" id="envoi"> Envoyer les emails pour de vrai, vers ta boîte de test (via n8n et SendGrid)</label><span id="envoi-etat" aria-live="polite"></span></div>
+  </div>
+
+  <details class="panel guide">
+    <summary>Déroulé conseillé pour la démo, en 2 minutes</summary>
+    <ol>
+      <li>« Partir de zéro », puis créer une commande livrable dans 6 jours ouvrés.</li>
+      <li>« Lancer le passage de 7h » : le client reçoit l’email de suivi avec son lien.</li>
+      <li>« Jour suivant » jusqu’à D − 3 : alerte « risque de retard » pour l’équipe, rien pour le client.</li>
+      <li>« Jour suivant » : D − 2 sans nouvelle date, le client est prévenu du retard.</li>
+      <li>Décaler la date de 5 jours ouvrés, puis « Jour suivant » : email « nouvelle date », palier 2.</li>
+      <li>Passer en préparation, expédiée, livrée en avançant les jours : email « livrée, avec nos excuses ».</li>
+      <li>À tout moment : « Voir son espace de suivi ».</li>
+    </ol>
+  </details>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="t-liste">
+      <p class="lbl" id="t-liste">Commandes dans l’ERP</p>
+      <div class="scroll" id="liste"></div>
+      <form class="nc" id="nc">
+        <input id="nc-co" type="text" placeholder="Entreprise" value="Chantiers Martin" aria-label="Entreprise">
+        <input id="nc-em" type="email" placeholder="Email du contact" value="achats@chantiers-martin.fr" aria-label="Email du contact">
+        <label for="nc-j">Livraison dans</label><input id="nc-j" type="number" value="6" min="1" max="40"><span>j.o.</span>
+        <button class="btn" type="submit">Créer la commande</button>
+      </form>
+    </section>
+    <section class="panel" id="detail" aria-label="Fiche commande"></section>
+  </div>
+
+  <section id="espace-wrap" hidden>
+    <div class="row" style="justify-content:space-between"><p class="lbl">Espace de suivi du client, tel qu’il le voit ce jour-là</p><button class="btn ghost" id="close-espace">Fermer</button></div>
+    <iframe id="espace" title="Espace de suivi client" sandbox></iframe>
+  </section>
+
+  <section class="panel" aria-labelledby="t-jour">
+    <p class="lbl" id="t-jour" style="font-size:13px">Ce que le passage de ce matin a produit</p>
+    <div id="jour"></div>
+  </section>
+</div>
+<script>
+// ===== Bibliothèque commune · Suivi de commande client (Growth Ex Machina × Qwokka) =====
+// Dates en chaînes AAAA-MM-JJ (fuseau Europe/Paris), jours ouvrés France, jeton d'espace de suivi, échappement HTML.
+const pad2 = n => String(n).padStart(2, '0');
+const toStr = d => `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+const parseDate = s => {
+  if (s === null || s === undefined) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s).trim());
+  if (!m) return null;
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  return isNaN(d) ? null : d;
+};
+const parisToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
+function easter(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+    f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+    i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+    month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(y, month - 1, day));
+}
+function makeCalendar(fermetures) {
+  const cache = {}; const extra = new Set(fermetures || []);
+  const feries = y => { const e = easter(y); const p = n => { const d = new Date(e); d.setUTCDate(d.getUTCDate() + n); return toStr(d); };
+    return new Set([`${y}-01-01`, p(1), `${y}-05-01`, `${y}-05-08`, p(39), p(50), `${y}-07-14`, `${y}-08-15`, `${y}-11-01`, `${y}-11-11`, `${y}-12-25`]); };
+  const isBD = d => { const w = d.getUTCDay(); if (w === 0 || w === 6) return false; const y = d.getUTCFullYear(); if (!cache[y]) cache[y] = feries(y); return !cache[y].has(toStr(d)) && !extra.has(toStr(d)); };
+  const addBD = (d, n) => { const x = new Date(d); const s = n >= 0 ? 1 : -1; let k = Math.abs(n); while (k > 0) { x.setUTCDate(x.getUTCDate() + s); if (isBD(x)) k--; } return x; };
+  const diffBD = (a, b) => { if (toStr(a) === toStr(b)) return 0; const s = b > a ? 1 : -1; const x = new Date(a); let c = 0, guard = 0; while (toStr(x) !== toStr(b) && guard++ < 4000) { x.setUTCDate(x.getUTCDate() + s); if (isBD(x)) c += s; } return c; };
+  const addDays = (d, n) => { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; };
+  return { isBD, addBD, diffBD, addDays };
+}
+const JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const frDate = d => `${JOURS[d.getUTCDay()]} ${d.getUTCDate() === 1 ? '1er' : d.getUTCDate()} ${MOIS[d.getUTCMonth()]}`;
+const frDateY = d => `${frDate(d)} ${d.getUTCFullYear()}`;
+const frShort = d => `${pad2(d.getUTCDate())}/${pad2(d.getUTCMonth() + 1)}`;
+const esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Jeton de l'espace de suivi : empreinte de l'email + secret. Démo uniquement ; en production, lien signé ou lien de connexion.
+function jeton(email, secret) {
+  const str = String(email || '').trim().toLowerCase() + '|' + secret;
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36) + (h1 >>> 0).toString(36);
+}
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+const STATUTS = ['Commande_confirmee', 'En_preparation', 'Expediee', 'Livree'];
+const parseSent = s => { try { const v = JSON.parse(s || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
+
+// ===== Moteur de règles · passage quotidien =====
+// Entrées : cfg (réglages), cmds (commandes ERP), memRows (mémoire du flux). Sortie : décisions par commande + messages.
+function moteur(cfg, cmds, memRows) {
+  const cal = makeCalendar(cfg.fermetures);
+  const T = parseDate(cfg.date_reference);
+  const mem = new Map(memRows.filter(r => r && r.order_number).map(r => [r.order_number, r]));
+  const premierPassage = mem.size === 0;
+  const lien = email => `${cfg.url_espace_suivi}?c=${jeton(email, cfg.secret_lien)}`;
+  const decisions = [];
+
+  for (const o of cmds) {
+    if (!o || !o.order_number) continue;
+    const m = mem.get(o.order_number) || null;
+    const D = parseDate(o.delivery_date);
+    const sent = m ? parseSent(m.sent) : [];
+    const has = k => sent.includes(k);
+    const r = { order_number: o.order_number, company: o.company, contact_email: o.contact_email, status: o.status,
+      delivery_date: o.delivery_date || '', client: null, client_bloque: null, alertes: [], affichage: '', pourquoi: [], memoire: null };
+    const alerte = (type, detail) => r.alertes.push({ type, detail });
+    const emailOk = EMAIL_RE.test(o.contact_email || '');
+
+    // Données inexploitables : rien côté client, alerte à l'équipe
+    if (!STATUTS.includes(o.status)) { alerte('STATUT_INCONNU', `Statut « ${o.status} » hors des 4 statuts de l’API : aucune notification client`); r.pourquoi.push('Statut inconnu : le flux s’abstient.'); decisions.push(r); continue; }
+    if (!D) { alerte('DATE_MANQUANTE', 'Date de livraison annoncée absente'); r.pourquoi.push('Pas de date : aucun calcul possible.'); decisions.push(r); continue; }
+
+    const L = cal.addBD(D, -(cfg.prepa_jo + cfg.transport_jo));            // date limite d'arrivée des pièces (D − 3)
+    const seuilRisque = cal.addBD(D, -cfg.alerte_risque_jo);               // début de l'alerte « risque de retard »
+    const nouveau = !m;                                                     // première observation de la commande
+    const statutChange = !m || m.last_status !== o.status;
+    const statusSince = statutChange ? T : (parseDate(m.status_since) || T);
+    let nbGliss = m ? Number(m.nb_glissements || 0) : 0;
+    const initiale = m && m.initial_delivery_date ? m.initial_delivery_date : o.delivery_date;
+    let msg = null;
+    let situation = null;                                                   // retard déjà constaté à la découverte d'une commande
+
+    // 1. Changement de date saisi par le distributeur (détecté grâce à la mémoire)
+    const ancienne = m ? parseDate(m.last_delivery_date) : null;
+    if (ancienne && toStr(ancienne) !== toStr(D) && o.status !== 'Livree') {
+      const gl = cal.diffBD(ancienne, D);
+      if (gl > 0) {
+        nbGliss += 1;
+        if (nbGliss >= 2) { msg = { type: 'RETARD_REPETE', palier: gl >= cfg.palier2_jo ? 2 : 1, glissement: gl, rang: nbGliss, ancienne: toStr(ancienne) }; alerte('RETARD_REPETE', `${nbGliss}e report de date (+${gl} j.o.) : démarche personnalisée à envisager`); }
+        else msg = { type: 'NOUVELLE_DATE', palier: gl >= cfg.palier2_jo ? 2 : 1, glissement: gl, ancienne: toStr(ancienne) };
+        r.pourquoi.push(`Nouvelle date saisie : ${frShort(ancienne)} → ${frShort(D)} (+${gl} j.o., palier ${msg.palier}).`);
+      } else r.pourquoi.push(`Date avancée (${frShort(ancienne)} → ${frShort(D)}) : espace de suivi mis à jour, pas d’email.`);
+    }
+
+    switch (o.status) {
+      case 'Commande_confirmee':
+        if (T > L) {                                   // D − 2 ou après : retard certain
+          r.affichage = 'Livraison retardée';
+          if (!msg) {
+            if ((nouveau && premierPassage) || has(`REPRISE|${o.delivery_date}`)) { if (nouveau) r.marqueur = `REPRISE|${o.delivery_date}`; alerte('RETARD_EXISTANT', `Déjà en retard à la mise en service (pièces attendues avant le ${frShort(L)}) : client à prévenir par l’équipe`); r.pourquoi.push('Déjà en retard à la mise en service du flux : pas de message client, l’équipe décide.'); }
+            else {
+              alerte('PROBLEME_NON_RESOLU', `Pièces attendues avant le ${frShort(L)}, aucune nouvelle date saisie`);
+              if (nouveau) { situation = { retard: 'appro', cle: `RETARD_EN_COURS|${o.delivery_date}` }; r.pourquoi.push(`Découverte déjà en retard (date limite ${frShort(L)} dépassée) : l’email de suivi annonce le retard.`); }
+              else if (!has(`RETARD_EN_COURS|${o.delivery_date}`)) { msg = { type: 'RETARD_EN_COURS' }; r.pourquoi.push(`Retard certain (date limite ${frShort(L)} dépassée), rien n’a été saisi : filet de sécurité.`); }
+              else r.pourquoi.push('Client déjà prévenu de ce retard : alerte interne quotidienne seulement.');
+            }
+          }
+        } else if (T >= seuilRisque) {                 // D − 3 (réglable) : risque de retard, interne seulement
+          alerte('RISQUE_RETARD', `Pièces à recevoir au plus tard le ${frShort(L)} pour tenir le ${frShort(D)}`);
+          r.affichage = 'En attente des articles fournisseurs';
+          r.pourquoi.push('Dernier jour pour tenir la date : l’équipe est alertée, pas le client.');
+        } else { r.affichage = 'En attente des articles fournisseurs'; if (!msg) r.pourquoi.push(`Dans les temps (date limite ${frShort(L)}).`); }
+        break;
+      case 'En_preparation': {
+        const jours = cal.diffBD(statusSince, T);
+        r.affichage = 'En préparation dans nos entrepôts';
+        if (jours > cfg.prepa_jo) alerte('PREPA_DEPASSEE', `En préparation depuis ${jours} j.o. (standard : ${cfg.prepa_jo})`);
+        if (toStr(T) >= toStr(D)) {
+          r.affichage = 'Risque de retard de livraison';
+          alerte('DATE_COMPROMISE', `Jour de livraison annoncé et commande pas encore expédiée`);
+          if (nouveau) situation = { retard: 'prepa', cle: `RISQUE_RETARD_PREPA|${o.delivery_date}` };
+          else if (!msg && !has(`RISQUE_RETARD_PREPA|${o.delivery_date}`)) { msg = { type: 'RISQUE_RETARD_PREPA' }; r.pourquoi.push('Jour D, toujours en préparation : message prudent au client.'); }
+        } else if (!msg) r.pourquoi.push(jours > cfg.prepa_jo ? 'Préparation plus longue que prévu : alerte interne.' : 'Préparation normale : rien à envoyer.');
+        break;
+      }
+      case 'Expediee': {
+        const apres = cal.diffBD(D, T);
+        r.affichage = 'Expédiée · livraison prévue le ' + frDate(D);
+        if (apres >= 1) { alerte('LIVRAISON_NON_CONFIRMEE', `Expédiée, date annoncée dépassée de ${apres} j.o. : vérifier le transporteur`); r.affichage = 'Expédiée · livraison en cours de vérification'; }
+        if (apres >= 2 && nouveau) situation = { retard: 'transport', cle: `LIVRAISON_RETARDEE|${o.delivery_date}` };
+        else if (apres >= 2 && !msg && !has(`LIVRAISON_RETARDEE|${o.delivery_date}`)) { msg = { type: 'LIVRAISON_RETARDEE' }; r.pourquoi.push('D + 2 sans livraison confirmée : message au client.'); }
+        else if (!msg) r.pourquoi.push(apres >= 1 ? 'Livraison non confirmée : alerte interne.' : 'Expédiée : pas d’email, l’espace de suivi suffit.');
+        break;
+      }
+      case 'Livree': {
+        r.affichage = 'Livrée';
+        const enRetard = nbGliss > 0 || sent.some(k => /^(RETARD_EN_COURS|RISQUE_RETARD_PREPA|LIVRAISON_RETARDEE|NOUVELLE_DATE|RETARD_REPETE)\|/.test(k));
+        if (!nouveau && statutChange && !has('LIVREE')) { msg = { type: enRetard ? 'LIVREE_RETARD' : 'LIVREE' }; r.pourquoi.push(enRetard ? 'Livrée après un retard : confirmation avec excuses.' : 'Livrée : confirmation et lien vers le support.'); }
+        else r.pourquoi.push(nouveau ? 'Déjà livrée à la première observation : rien.' : 'Livraison déjà confirmée au client.');
+        break;
+      }
+    }
+
+    // Nouvelle commande (hors mise en service, hors déjà livrée) : un seul email, celui de suivi avec le lien vers l'espace.
+    // S'il y a déjà un retard à la découverte, l'email de suivi l'annonce : pas de second email le même jour.
+    if (nouveau && !premierPassage && o.status !== 'Livree') {
+      msg = { type: 'SUIVI_COMMANDE', retard: situation ? situation.retard : null, cles_extra: situation ? [situation.cle] : [] };
+      r.pourquoi.push(situation ? 'Nouvelle commande, déjà en retard : email de suivi avec l’information de retard.' : 'Nouvelle commande : email de suivi avec le lien vers l’espace de suivi.');
+    }
+    // Mise en service : au tout premier passage, aucune notification client
+    if (msg && premierPassage) { r.pourquoi.push('Premier passage du flux : notification client retenue, l’équipe traite d’abord.'); msg = null; }
+    if (msg) {
+      msg.cle = msg.type === 'LIVREE' || msg.type === 'LIVREE_RETARD' ? 'LIVREE' : msg.type === 'SUIVI_COMMANDE' ? 'SUIVI' : `${msg.type}|${o.delivery_date}`;
+      if (!emailOk) { r.client_bloque = { ...msg, raison: 'email invalide' }; alerte('EMAIL_INVALIDE', `« ${o.contact_email || ''} » : le message ${msg.type} n’a pas pu partir`); }
+      else r.client = { ...msg, ...rendreEmailClient(msg, o, D, cfg, lien(o.contact_email), cal) };
+    }
+    const sentApres = [...sent, ...(r.client ? [r.client.cle, ...(r.client.cles_extra || [])] : []), ...(r.marqueur ? [r.marqueur] : [])];
+    r.memoire = { order_number: o.order_number, contact_email: o.contact_email || '', last_status: o.status, status_since: toStr(statusSince),
+      last_delivery_date: o.delivery_date, initial_delivery_date: initiale, nb_glissements: nbGliss, sent: JSON.stringify(sentApres), last_seen: toStr(T) };
+    r.lien_espace = lien(o.contact_email);
+    decisions.push(r);
+  }
+  return { decisions, premierPassage, digest: rendreDigest(decisions, cfg) };
+}
+
+// ===== Modèles d'emails clients =====
+function rendreEmailClient(m, o, D, cfg, lienEspace, cal) {
+  const n = o.order_number, B = cfg.marque;
+  let sujet, paras = [], encadre = [];
+  switch (m.type) {
+    case 'SUIVI_COMMANDE': {
+      const etat = { appro: 'Livraison retardée, nouvelle date en cours de confirmation', prepa: 'En préparation, risque de retard', transport: 'Expédiée, livraison non confirmée' }[m.retard]
+        || { Commande_confirmee: 'Confirmée', En_preparation: 'En préparation', Expediee: 'Expédiée' }[o.status] || '';
+      sujet = m.retard ? `Commande ${n} : suivi de votre commande et information de livraison` : `Commande ${n} : suivez votre commande en ligne`;
+      paras = [`Merci pour votre commande n° ${n}. Vous pouvez suivre son avancement à tout moment depuis votre espace de suivi : préparation, expédition et livraison.`];
+      if (m.retard === 'appro') paras.push(`Certains articles ne nous sont pas encore parvenus de nos fournisseurs : nous ne pourrons pas vous livrer à la date prévue du ${frDateY(D)}. Nous vous communiquerons votre nouvelle date de livraison dès qu’elle sera confirmée.`);
+      else if (m.retard === 'prepa') paras.push(`Votre commande est en cours de préparation dans nos entrepôts et sa livraison, prévue le ${frDateY(D)}, risque d’être retardée. Nous traitons actuellement le sujet.`);
+      else if (m.retard === 'transport') paras.push(`Votre commande a été remise à notre transporteur, mais sa livraison ne nous a pas encore été confirmée. Si vous ne l’avez pas reçue, nous vérifions immédiatement auprès du transporteur.`);
+      else paras.push(`Livraison prévue le <b>${frDateY(D)}</b>. Vous serez prévenu par email si cette date devait changer.`);
+      paras.push(`Pour toute question, notre service client est à votre disposition : il vous suffit de répondre à cet email.`);
+      encadre = [['Commande', n], ['Livraison prévue', frDateY(D)], ['Statut', etat]];
+      break;
+    }
+    case 'RETARD_EN_COURS':
+      sujet = `Commande ${n} : votre livraison du ${frShort(D)} sera retardée`;
+      paras = [`Certains articles de votre commande n° ${n} ne nous sont pas encore parvenus de nos fournisseurs. Nous ne pourrons pas vous livrer à la date prévue du ${frDateY(D)}.`,
+        `Notre équipe met tout en œuvre pour résoudre la situation. Nous vous communiquerons votre nouvelle date de livraison dès qu’elle sera confirmée.`,
+        `Pour toute question, notre service client est à votre disposition : il vous suffit de répondre à cet email.`];
+      encadre = [['Commande', n], ['Livraison initialement prévue', frDateY(D)], ['Statut', 'Nouvelle date en cours de confirmation']];
+      break;
+    case 'NOUVELLE_DATE':
+      sujet = `Commande ${n} : nouvelle date de livraison, ${frDate(D)}`;
+      paras = [`Votre commande n° ${n} ne pourra pas être livrée à la date annoncée du ${frDateY(parseDate(m.ancienne))}. Nous vous prions de nous excuser pour ce contretemps.`,
+        `Votre nouvelle date de livraison est le <b>${frDateY(D)}</b>.`];
+      if (m.palier === 2) paras.push(`Nous mesurons la gêne que représente un tel décalage. Notre service client se tient à votre disposition pour en parler : répondez simplement à cet email.`);
+      encadre = [['Commande', n], ['Nouvelle date de livraison', frDateY(D)]];
+      break;
+    case 'RETARD_REPETE':
+      sujet = `Commande ${n} : nouveau report de livraison, ${frDate(D)}`;
+      paras = [`Nous sommes sincèrement désolés : la livraison de votre commande n° ${n} doit à nouveau être décalée.`,
+        `Votre nouvelle date de livraison est le <b>${frDateY(D)}</b>.`,
+        `Notre service client va revenir vers vous personnellement. Vous pouvez aussi répondre directement à cet email.`];
+      encadre = [['Commande', n], ['Nouvelle date de livraison', frDateY(D)], ['Report', `${m.rang}e report`]];
+      break;
+    case 'RISQUE_RETARD_PREPA':
+      sujet = `Commande ${n} : risque de retard de livraison`;
+      paras = [`Votre commande n° ${n}, prévue pour aujourd’hui, est encore en cours de préparation dans nos entrepôts. Sa livraison risque d’être retardée.`,
+        `Nous traitons actuellement le sujet. Vous pouvez vous rapprocher de notre service client pour plus d’informations, en répondant à cet email.`];
+      encadre = [['Commande', n], ['Livraison prévue', frDateY(D)], ['Statut', 'En préparation']];
+      break;
+    case 'LIVRAISON_RETARDEE':
+      sujet = `Commande ${n} : votre livraison semble retardée`;
+      paras = [`Votre commande n° ${n} a été remise à notre transporteur, mais sa livraison ne nous a pas encore été confirmée.`,
+        `Si vous ne l’avez pas reçue, contactez notre service client en répondant à cet email : nous vérifions immédiatement auprès du transporteur.`];
+      encadre = [['Commande', n], ['Livraison prévue', frDateY(D)], ['Statut', 'Expédiée, livraison non confirmée']];
+      break;
+    case 'LIVREE':
+      sujet = `Commande ${n} livrée`;
+      paras = [`Votre commande n° ${n} a bien été livrée. Merci pour votre confiance.`,
+        `Si vous n’avez pas reçu votre commande ou si un article manque, contactez notre service client en répondant à cet email.`];
+      encadre = [['Commande', n], ['Statut', 'Livrée']];
+      break;
+    case 'LIVREE_RETARD':
+      sujet = `Commande ${n} livrée, avec nos excuses`;
+      paras = [`Votre commande n° ${n} a bien été livrée. Nous vous renouvelons nos excuses pour le retard rencontré.`,
+        `Si vous n’avez pas reçu votre commande ou si un article manque, contactez notre service client en répondant à cet email.`];
+      encadre = [['Commande', n], ['Statut', 'Livrée']];
+      break;
+  }
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#15171C;max-width:560px;margin:0 auto">`
+    + `<p style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#C2360F;margin:0 0 18px">${esc(B)} · Suivi de commande</p>`
+    + `<p>Bonjour,</p>${paras.map(p => `<p>${p}</p>`).join('')}`
+    + `<table style="border-collapse:collapse;width:100%;margin:20px 0;background:#F7F5F0;border-radius:8px">${encadre.map(([k, v]) => `<tr><td style="padding:9px 14px;color:#5F6470;font-size:13px">${esc(k)}</td><td style="padding:9px 14px;font-weight:bold">${esc(v)}</td></tr>`).join('')}</table>`
+    + `<p style="margin:24px 0"><a href="${lienEspace}" style="background:#15171C;color:#F7F5F0;text-decoration:none;padding:12px 20px;border-radius:999px;font-weight:bold">Suivre mes commandes</a></p>`
+    + `<p>Bien cordialement,<br>L’équipe service client ${esc(B)}</p></div>`;
+  return { sujet, html };
+}
+
+// ===== Récapitulatif interne quotidien =====
+const LIBELLES = {
+  PROBLEME_NON_RESOLU: ['Retard sans nouvelle date · client notifié', 1], RETARD_EXISTANT: ['Déjà en retard à la mise en service', 1],
+  DATE_COMPROMISE: ['Date compromise en préparation', 1], RETARD_REPETE: ['Reports de date répétés', 2],
+  RISQUE_RETARD: ['Risque de retard', 2], PREPA_DEPASSEE: ['Délai de préparation dépassé', 3],
+  LIVRAISON_NON_CONFIRMEE: ['Livraison non confirmée', 3], EMAIL_INVALIDE: ['Email non délivrable', 4],
+  STATUT_INCONNU: ['Statut inconnu', 4], DATE_MANQUANTE: ['Date de livraison manquante', 4],
+};
+function rendreDigest(decisions, cfg) {
+  const T = parseDate(cfg.date_reference);
+  const lignes = decisions.flatMap(r => r.alertes.map(a => ({ ...a, r })));
+  const types = Object.keys(LIBELLES).filter(t => lignes.some(l => l.type === t)).sort((a, b) => LIBELLES[a][1] - LIBELLES[b][1]);
+  const envoyes = decisions.filter(r => r.client);
+  const sujet = `[Suivi commandes] ${frDate(T)} · ${lignes.length} alerte${lignes.length > 1 ? 's' : ''}, ${envoyes.length} email${envoyes.length > 1 ? 's' : ''} client`;
+  let html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#15171C;max-width:780px">`
+    + `<p style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#C2360F">${esc(cfg.marque)} · Récapitulatif du ${frDateY(T)}</p>`
+    + `<p>Bonjour l’équipe,</p><p>${lignes.length ? `${lignes.length} point(s) demandent votre attention ce matin. Les décisions restent les vôtres ; une fois l’ERP mis à jour, le client est prévenu automatiquement.` : 'Rien à signaler ce matin.'}</p>`;
+  for (const t of types) {
+    const ls = lignes.filter(l => l.type === t);
+    html += `<h3 style="font-size:15px;margin:22px 0 6px">${esc(LIBELLES[t][0])} (${ls.length})</h3><table style="border-collapse:collapse;width:100%;font-size:13px">`
+      + `<tr style="text-align:left;color:#5F6470"><th style="padding:4px 8px">Commande</th><th style="padding:4px 8px">Client</th><th style="padding:4px 8px">Annoncée</th><th style="padding:4px 8px">Détail</th><th style="padding:4px 8px">Client prévenu</th></tr>`
+      + ls.map(l => `<tr style="border-top:1px solid #DCD8CF"><td style="padding:6px 8px;font-family:monospace">${esc(l.r.order_number)}</td><td style="padding:6px 8px">${esc(l.r.company)}</td><td style="padding:6px 8px">${l.r.delivery_date ? frShort(parseDate(l.r.delivery_date)) : '–'}</td><td style="padding:6px 8px">${esc(l.detail)}</td><td style="padding:6px 8px">${l.r.client ? 'oui, ce matin' : (l.r.memoire && parseSent(l.r.memoire.sent).some(k => k !== 'SUIVI' && !k.startsWith('REPRISE|')) ? 'oui, déjà' : 'non')}</td></tr>`).join('') + `</table>`;
+  }
+  if (envoyes.length) html += `<h3 style="font-size:15px;margin:22px 0 6px">Emails clients envoyés ce matin (${envoyes.length})</h3><ul>${envoyes.map(r => `<li>${esc(r.order_number)} · ${esc(r.company)} · ${esc(r.client.sujet)}</li>`).join('')}</ul>`;
+  html += `</div>`;
+  return { sujet, html, nb_alertes: lignes.length };
+}
+
+// ===== Pages web : espace de suivi client et aperçu « qui recevrait quoi » =====
+const PAGE_CSS = `*{box-sizing:border-box}body{margin:0;background:#F7F5F0;color:#15171C;font-family:Sora,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:880px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-left)) 64px}
+.eyebrow{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#C2360F}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.1;margin:8px 0 6px;font-weight:800;letter-spacing:-.02em}
+.muted{color:#5F6470}.card{background:#FFFDF8;border:1px solid #DCD8CF;border-radius:16px;padding:22px;margin-top:18px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:baseline}
+.num{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:500}.co{font-weight:700;font-size:18px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:18px 0 12px}
+.step{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#5F6470}
+.bar{height:6px;border-radius:3px;background:#DCD8CF}.done .bar{background:#15171C}.cur .bar{background:#FF4D1F}.cur{color:#15171C;font-weight:700}.done{color:#15171C}
+.etat{display:inline-block;margin-top:4px;padding:6px 12px;border-radius:999px;background:#EDEAE3;font-size:14px;font-weight:600}
+.etat.alerte{background:#FFE4D9;color:#8E2A0B}.etat.ok{background:#E3F1E7;color:#1F6B3A}
+.meta{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:12px;font-size:14px;color:#5F6470}.meta b{color:#15171C;font-weight:600}
+.foot{margin-top:28px;font-size:14px}
+@media (max-width:520px){.steps{grid-template-columns:repeat(2,1fr)}}`;
+const ETAPES = [['Commande_confirmee', 'Confirmée'], ['En_preparation', 'En préparation'], ['Expediee', 'Expédiée'], ['Livree', 'Livrée']];
+
+function pageEspaceSuivi(cfg, cmds, memRows, token) {
+  const calc = moteur(cfg, cmds, memRows).decisions;
+  const mem = new Map(memRows.filter(r => r && r.order_number).map(r => [r.order_number, r]));
+  const mine = calc.filter(r => r.contact_email && jeton(r.contact_email, cfg.secret_lien) === token && ETAPES.some(e => e[0] === r.status));
+  const head = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Suivi de mes commandes · ${esc(cfg.marque)}</title>`
+    + `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap"><style>${PAGE_CSS}</style></head><body><div class="wrap">`;
+  if (!token || !mine.length) return head + `<p class="eyebrow">${esc(cfg.marque)} · Suivi de commande</p><h1>Lien invalide ou expiré</h1><p class="muted">Utilisez le bouton « Suivre mes commandes » de votre dernier email, ou répondez-y pour contacter notre service client.</p></div></body></html>`;
+  const order = s => ETAPES.findIndex(e => e[0] === s);
+  const cartes = mine.sort((a, b) => order(a.status) - order(b.status) || (a.delivery_date || '').localeCompare(b.delivery_date || '')).map(r => {
+    const cur = order(r.status), m = mem.get(r.order_number), D = parseDate(r.delivery_date);
+    const init = m && m.initial_delivery_date && m.initial_delivery_date !== r.delivery_date ? parseDate(m.initial_delivery_date) : null;
+    const alerte = /retard|risque|vérification/i.test(r.affichage);
+    const etat = r.status === 'Livree' ? 'ok' : alerte ? 'alerte' : '';
+    const dateTxt = r.status === 'Livree' ? 'Livrée' : alerte && r.status === 'Commande_confirmee' ? 'Nouvelle date en cours de confirmation' : (D ? frDateY(D) : '–');
+    return `<section class="card"><div class="top"><span class="co">${esc(r.company)}</span><span class="num">${esc(r.order_number)}</span></div>`
+      + `<div class="steps">${ETAPES.map((e, i) => `<div class="step ${i < cur ? 'done' : i === cur ? 'cur' : ''}"><span class="bar"></span>${e[1]}</div>`).join('')}</div>`
+      + (r.affichage && r.affichage !== 'En attente des articles fournisseurs' ? `<span class="etat ${etat}">${esc(r.affichage)}</span>` : '')
+      + `<div class="meta"><span>Livraison : <b>${esc(dateTxt)}</b></span>${init ? `<span>Initialement prévue le ${esc(frDate(init))}</span>` : ''}</div></section>`;
+  }).join('');
+  return head + `<p class="eyebrow">${esc(cfg.marque)} · Suivi de commande</p><h1>Vos commandes en cours</h1><p class="muted">${esc(mine[0].contact_email)} · mis à jour chaque matin à 7h</p>${cartes}`
+    + `<p class="foot muted">Une question ? Répondez à l’un de nos emails : votre message arrive directement à notre service client.</p></div></body></html>`;
+}
+
+function pageApercu(cfg, res, cmds) {
+  const T = parseDate(cfg.date_reference);
+  const ATT = new Map(cmds.map(c => [c.order_number, c]));
+  const nbClient = res.decisions.filter(r => r.client).length;
+  const lignes = res.decisions.map(r => {
+    const c = ATT.get(r.order_number) || {};
+    return `<tr><td class="num">${esc(r.order_number)}<div class="muted">${esc(r.company)}</div></td><td>${esc(r.status)}</td><td>${r.delivery_date ? frShort(parseDate(r.delivery_date)) : '–'}</td>`
+      + `<td>${r.client ? `<b>${esc(r.client.type)}</b>` : r.client_bloque ? `<span class="ko">bloqué : ${esc(r.client_bloque.raison)}</span>` : '<span class="muted">–</span>'}</td>`
+      + `<td>${r.alertes.map(a => `<span class="pill">${esc(a.type)}</span>`).join(' ') || '<span class="muted">–</span>'}</td>`
+      + `<td class="muted">${esc(r.pourquoi.join(' '))}${c.scenario ? `<div class="scen">Scénario : ${esc(c.scenario)}</div>` : ''}</td></tr>`;
+  }).join('');
+  const emails = res.decisions.filter(r => r.client).map(r => `<article class="mail"><div class="mh"><span class="muted">À</span> ${esc(r.contact_email)}<br><span class="muted">Objet</span> <b>${esc(r.client.sujet)}</b></div><div class="mb">${r.client.html}</div></article>`).join('');
+  const css = PAGE_CSS + `.wrap{max-width:1200px}table{width:100%;border-collapse:collapse;font-size:14px;background:#FFFDF8}th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#5F6470;padding:10px;border-bottom:1px solid #DCD8CF}td{padding:10px;border-top:1px solid #DCD8CF;vertical-align:top}.box{overflow-x:auto;border:1px solid #DCD8CF;border-radius:14px;margin-top:16px}.pill{display:inline-block;font-size:12px;background:#FFE4D9;color:#8E2A0B;border-radius:6px;padding:2px 7px;margin:1px 0}.ko{color:#8E2A0B;font-weight:600}.scen{color:#15171C;font-style:italic;margin-top:4px}.mails{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:16px;margin-top:16px}.mail{background:#fff;border:1px solid #DCD8CF;border-radius:14px;overflow:hidden}.mh{padding:12px 16px;border-bottom:1px solid #DCD8CF;font-size:14px}.mb{padding:16px}h2{font-size:22px;margin:36px 0 0}`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Qui recevrait quoi · ${esc(cfg.marque)}</title>`
+    + `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap"><style>${css}</style></head><body><div class="wrap">`
+    + `<p class="eyebrow">Aperçu · aucun email envoyé · ${esc(frDateY(T))}</p><h1>Qui recevrait quoi ce matin</h1>`
+    + `<p class="muted">${res.decisions.length} commandes analysées · ${nbClient} email(s) client · 1 récapitulatif interne (${res.digest.nb_alertes} alerte(s))${res.premierPassage ? ' · premier passage : aucune notification client' : ''}</p>`
+    + `<div class="box"><table><tr><th>Commande</th><th>Statut ERP</th><th>Annoncée</th><th>Email client</th><th>Alertes équipe</th><th>Pourquoi</th></tr>${lignes}</table></div>`
+    + `<h2>Emails clients</h2><div class="mails">${emails || '<p class="muted">Aucun email client.</p>'}</div>`
+    + `<h2>Récapitulatif interne</h2><article class="mail" style="margin-top:16px"><div class="mh"><span class="muted">Objet</span> <b>${esc(res.digest.sujet)}</b></div><div class="mb">${res.digest.html}</div></article>`
+    + `</div></body></html>`;
+}
+
+// ===== Jeu de démo : 30 commandes « ERP » + mémoire de la veille, dates relatives au jour du lancement =====
+// Chaque commande porte son scénario et le résultat attendu : le jeu sert aussi de test de non-régression.
+function genererDemo(cfg) {
+  const cal = makeCalendar(cfg.fermetures);
+  const T = parseDate(cfg.date_reference);
+  const bd = n => toStr(cal.addBD(T, n));          // T ± n jours ouvrés
+  const hier = toStr(cal.addDays(T, -1));
+  const S = (o, m, scenario, attendu) => ({ o, m, scenario, attendu });
+  const k = (t, d) => `${t}|${d}`;
+  const L = [
+    // --- Phase 1 et 2 : commande confirmée, approvisionnement
+    S({ company: 'Menuiserie Lefèvre', contact_email: 'achats@menuiserie-lefevre.fr', order_date: bd(-2), delivery_date: bd(10), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-2) }, 'Confirmée, large marge', { client: null, alertes: [] }),
+    S({ company: 'Électricité Moreau', contact_email: 'achats@elec-moreau.fr', order_date: bd(-1), delivery_date: bd(8), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-1) }, 'Confirmée, large marge', { client: null, alertes: [] }),
+    S({ company: 'Menuiserie Lefèvre', contact_email: 'achats@menuiserie-lefevre.fr', order_date: bd(-4), delivery_date: bd(6), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-4) }, '2e commande du même contact (espace de suivi commun)', { client: null, alertes: [] }),
+    S({ company: 'Plomberie Dubois', contact_email: 'm.dubois@plomberie-dubois.fr', order_date: bd(-6), delivery_date: bd(4), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-6) }, 'Veille du jour limite : rien encore', { client: null, alertes: [] }),
+    S({ company: 'Garage Petit & Fils', contact_email: 'atelier@garage-petit.fr', order_date: bd(-7), delivery_date: bd(3), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-7) }, 'D − 3 : pièces manquantes, alerte « risque de retard »', { client: null, alertes: ['RISQUE_RETARD'] }),
+    S({ company: 'Chauffage Roux', contact_email: 'j.roux@chauffage-roux.fr', order_date: bd(-8), delivery_date: bd(3), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-8) }, 'D − 3 : deuxième commande à risque', { client: null, alertes: ['RISQUE_RETARD'] }),
+    S({ company: 'BTP Rhône Construction', contact_email: 'achats@btp-rhone.fr', order_date: bd(-9), delivery_date: bd(2), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-9) }, 'D − 2, rien saisi : filet de sécurité (cas 3)', { client: 'RETARD_EN_COURS', alertes: ['PROBLEME_NON_RESOLU'] }),
+    S({ company: 'Atelier Girard', contact_email: 'commandes@atelier-girard.fr', order_date: bd(-10), delivery_date: bd(1), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-10), sent: [k('RETARD_EN_COURS', bd(1))] }, 'Retard déjà annoncé hier : pas de doublon', { client: null, alertes: ['PROBLEME_NON_RESOLU'] }),
+    S({ company: 'Carrosserie Lambert', contact_email: 'pieces@carrosserie-lambert.fr', order_date: bd(-10), delivery_date: bd(4), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-10), last_delivery_date: bd(1) }, 'Nouvelle date saisie, +3 j.o. (cas 1, palier 1)', { client: 'NOUVELLE_DATE', alertes: [] }),
+    S({ company: 'Industries Fontaine', contact_email: 'supply@industries-fontaine.fr', order_date: bd(-12), delivery_date: bd(7), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-12), last_delivery_date: bd(1) }, 'Nouvelle date saisie, +6 j.o. (cas 3, palier 2)', { client: 'NOUVELLE_DATE', alertes: [] }),
+    S({ company: 'Froid Industriel Bonnet', contact_email: 'logistique@froid-bonnet.fr', order_date: bd(-15), delivery_date: bd(5), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-15), last_delivery_date: bd(1), initial_delivery_date: bd(-3), nb_glissements: 1, sent: [k('NOUVELLE_DATE', bd(1))] }, '2e report de date : retard répété', { client: 'RETARD_REPETE', alertes: ['RETARD_REPETE'] }),
+    S({ company: 'Toitures Garnier', contact_email: 'contact@toitures-garnier.fr', order_date: bd(-1), delivery_date: bd(2), status: 'Commande_confirmee' }, null, 'Nouvelle commande, date trop proche : l’email de suivi annonce le retard', { client: 'SUIVI_COMMANDE', alertes: ['PROBLEME_NON_RESOLU'] }),
+    S({ company: 'Maçonnerie Clément', contact_email: 'contact@maconnerie-clement', order_date: bd(-9), delivery_date: bd(2), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-9) }, 'Retard certain mais email invalide : message bloqué', { client: null, alertes: ['PROBLEME_NON_RESOLU', 'EMAIL_INVALIDE'] }),
+    S({ company: 'Paysages Mercier', contact_email: 'bureau@paysages-mercier.fr', order_date: bd(-1), delivery_date: bd(12), status: 'Commande_confirmee' }, null, 'Nouvelle commande confirmée hier : email de suivi avec le lien', { client: 'SUIVI_COMMANDE', alertes: [] }),
+    S({ company: 'Électricité Moreau', contact_email: 'achats@elec-moreau.fr', order_date: bd(-1), delivery_date: bd(9), status: 'Commande_confirmee' }, null, 'Nouvelle commande d’un contact connu : email de suivi, même espace', { client: 'SUIVI_COMMANDE', alertes: [] }),
+    // --- Préparation
+    S({ company: 'Agencement Chevalier', contact_email: 'a.chevalier@agencement-chevalier.fr', order_date: bd(-8), delivery_date: bd(3), status: 'En_preparation' }, { last_status: 'Commande_confirmee', status_since: bd(-8) }, 'Entrée en préparation ce matin, dans les temps', { client: null, alertes: [] }),
+    S({ company: 'Sols & Revêtements Faure', contact_email: 'achats@sols-faure.fr', order_date: bd(-9), delivery_date: bd(1), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'En préparation depuis 2 j.o. : normal', { client: null, alertes: [] }),
+    S({ company: 'Métallerie Rousseau', contact_email: 'p.rousseau@metallerie-rousseau.fr', order_date: bd(-12), delivery_date: bd(2), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-3) }, 'En préparation depuis 3 j.o. : délai dépassé', { client: null, alertes: ['PREPA_DEPASSEE'] }),
+    S({ company: 'Isolation Vincent', contact_email: 'chantiers@isolation-vincent.fr', order_date: bd(-10), delivery_date: bd(0), status: 'En_preparation' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'Jour D, pas encore expédiée : message prudent', { client: 'RISQUE_RETARD_PREPA', alertes: ['DATE_COMPROMISE'] }),
+    // --- Transport
+    S({ company: 'Ventilation Muller', contact_email: 'k.muller@ventilation-muller.fr', order_date: bd(-8), delivery_date: bd(0), status: 'Expediee' }, { last_status: 'En_preparation', status_since: bd(-2) }, 'Expédiée hier : pas d’email', { client: null, alertes: [] }),
+    S({ company: 'Charpente Leroy', contact_email: 'contact@charpente-leroy.fr', order_date: bd(-9), delivery_date: bd(-1), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-2) }, 'D + 1 sans livraison : alerte interne', { client: null, alertes: ['LIVRAISON_NON_CONFIRMEE'] }),
+    S({ company: 'Outillage Pro Gauthier', contact_email: 'commandes@outillage-gauthier.fr', order_date: bd(-10), delivery_date: bd(-2), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-3) }, 'D + 2 sans livraison : message au client', { client: 'LIVRAISON_RETARDEE', alertes: ['LIVRAISON_NON_CONFIRMEE'] }),
+    S({ company: 'Quincaillerie Lefebvre', contact_email: 'magasin@quincaillerie-lefebvre.fr', order_date: bd(-11), delivery_date: bd(-3), status: 'Expediee' }, { last_status: 'Expediee', status_since: bd(-4), sent: [k('LIVRAISON_RETARDEE', bd(-3))] }, 'Client déjà prévenu : alerte interne seule', { client: null, alertes: ['LIVRAISON_NON_CONFIRMEE'] }),
+    // --- Livraison
+    S({ company: 'Peinture Mathieu', contact_email: 'contact@peinture-mathieu.fr', order_date: bd(-8), delivery_date: bd(-1), status: 'Livree' }, { last_status: 'Expediee', status_since: bd(-2) }, 'Livrée : confirmation', { client: 'LIVREE', alertes: [] }),
+    S({ company: 'Échafaudages Perrin', contact_email: 'logistique@echafaudages-perrin.fr', order_date: bd(-14), delivery_date: bd(-1), status: 'Livree' }, { last_status: 'Expediee', status_since: bd(-2), initial_delivery_date: bd(-4), nb_glissements: 1, sent: [k('NOUVELLE_DATE', bd(-1))] }, 'Livrée après un retard : excuses', { client: 'LIVREE_RETARD', alertes: [] }),
+    S({ company: 'Clôtures Robin', contact_email: 'achats@clotures-robin.fr', order_date: bd(-10), delivery_date: bd(-3), status: 'Livree' }, { last_status: 'Livree', status_since: bd(-3), sent: ['LIVREE'] }, 'Livraison déjà confirmée', { client: null, alertes: [] }),
+    S({ company: 'Terrassement Morel', contact_email: 'devis@terrassement-morel.fr', order_date: bd(-20), delivery_date: bd(-10), status: 'Livree' }, null, 'Déjà livrée à la première observation', { client: null, alertes: [] }),
+    // --- Données
+    S({ company: 'Aménagement Dupont', contact_email: 'contact@amenagement-dupont.fr', order_date: bd(-5), delivery_date: bd(6), status: 'Annulee' }, { last_status: 'Commande_confirmee', status_since: bd(-5) }, 'Statut hors API (annulation)', { client: null, alertes: ['STATUT_INCONNU'] }),
+    S({ company: 'Bureau d’études Lemoine', contact_email: 'projets@be-lemoine.fr', order_date: bd(-2), delivery_date: '', status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-2) }, 'Date de livraison vide', { client: null, alertes: ['DATE_MANQUANTE'] }),
+    S({ company: 'Électro Services Henry', contact_email: 'service@electro-henry.fr', order_date: bd(-4), delivery_date: bd(6), status: 'Commande_confirmee' }, { last_status: 'Commande_confirmee', status_since: bd(-4), last_delivery_date: bd(8) }, 'Date avancée par le distributeur : pas d’email', { client: null, alertes: [] }),
+  ];
+  const commandes = [], memoire = [];
+  L.forEach((s, i) => {
+    const num = `CMD-${toStr(T).slice(2, 4)}-${String(1201 + i).padStart(4, '0')}`;
+    commandes.push({ order_number: num, ...s.o, scenario: s.scenario, attendu: JSON.stringify(s.attendu) });
+    if (s.m) memoire.push({ order_number: num, contact_email: s.o.contact_email, last_status: s.m.last_status, status_since: s.m.status_since,
+      last_delivery_date: s.m.last_delivery_date || s.o.delivery_date, initial_delivery_date: s.m.initial_delivery_date || s.m.last_delivery_date || s.o.delivery_date,
+      nb_glissements: s.m.nb_glissements || 0, sent: JSON.stringify(s.m.sent || []), last_seen: hier });
+  });
+  commandes.sort((a, b) => (b.order_date || '').localeCompare(a.order_date || ''));
+  return { commandes, memoire };
+}
+
+// ===== Simulateur : interface (le moteur au-dessus est celui du workflow n8n, à l'identique) =====
+(() => {
+  const CFG = { prepa_jo: 2, transport_jo: 1, alerte_risque_jo: 3, palier2_jo: 4, marque: 'Distri Pro', fermetures: [],
+    url_espace_suivi: 'https://exmachina.app.n8n.cloud/webhook/suivi-simule', secret_lien: 'qwokka-demo-2026' };
+  const TYPES = { SUIVI_COMMANDE: 'Email de suivi + lien', RETARD_EN_COURS: 'Retard annoncé, nouvelle date à venir', NOUVELLE_DATE: 'Nouvelle date de livraison',
+    RETARD_REPETE: 'Nouveau report', RISQUE_RETARD_PREPA: 'Risque de retard (préparation)', LIVRAISON_RETARDEE: 'Livraison semble retardée',
+    LIVREE: 'Livrée', LIVREE_RETARD: 'Livrée, avec nos excuses', SUIVI: 'Email de suivi', REPRISE: 'Déjà en retard à la mise en service' };
+  const STAT = { Commande_confirmee: 'Confirmée', En_preparation: 'En préparation', Expediee: 'Expédiée', Livree: 'Livrée', Annulee: 'Annulée (hors API)' };
+  const $ = s => document.querySelector(s);
+  let S = null;
+  const cfg = () => ({ ...CFG, date_reference: S.T });
+  const cal = () => makeCalendar(CFG.fermetures);
+
+  function init(mode) {
+    const T = parisToday();
+    S = { T, ran: false, journal: [], last: null, sel: null, seq: 1, mode, espace: null, open: {}, envoi: S ? S.envoi : false, envoiEtat: '' };
+    if (mode === 'demo') { const d = genererDemo({ ...CFG, date_reference: T }); S.cmds = d.commandes.map(c => ({ ...c })); S.mem = d.memoire.map(m => ({ ...m })); S.sel = S.cmds[0] && S.cmds[0].order_number; }
+    else { S.cmds = []; S.mem = [{ order_number: '__flux_en_service__', sent: '[]' }]; }
+    render();
+  }
+  function log(order, kind, type, detail, extra) { S.journal.push({ T: S.T, order, kind, type, detail, ...(extra || {}) }); }
+
+  function passage() {
+    const res = moteur(cfg(), S.cmds, S.mem);
+    const m = new Map(S.mem.map(r => [r.order_number, r]));
+    for (const d of res.decisions) {
+      if (d.memoire) m.set(d.order_number, d.memoire);
+      if (d.client) log(d.order_number, 'email', d.client.type, d.client.sujet, { html: d.client.html, to: d.contact_email });
+      if (d.client_bloque) log(d.order_number, 'bloque', d.client_bloque.type, 'Email non envoyé : adresse invalide');
+      for (const a of d.alertes) log(d.order_number, 'alerte', a.type, a.detail);
+    }
+    S.mem = [...m.values()]; S.last = res; S.ran = true;
+    if (S.envoi) envoyer();
+  }
+  // Envoi réel : la page appelle le workflow n8n « Qwokka · 3 · Envoi depuis le simulateur » via le connecteur n8n de la personne qui la regarde.
+  let MCP = null, ENVOI_OK = false;
+  const WF_ENVOI = 'K1tiqelN28grpXdY';
+  async function envoyer() {
+    const jour = frShort(parseDate(S.T));
+    const msgs = S.journal.filter(j => j.T === S.T && j.kind === 'email').map(j => ({ dest: 'client', subject: `[SIMU ${jour} → ${j.to}] ${j.detail}`, html: j.html }));
+    msgs.push({ dest: 'interne', subject: `[SIMU ${jour}] ${S.last.digest.sujet}`, html: S.last.digest.html });
+    const n = msgs.length - 1;
+    // Espaces de suivi du jour, un par contact : le lien des emails reçus ouvre l'espace tel que la simulation le voit.
+    const contacts = [...new Set(S.cmds.map(c => c.contact_email).filter(e => EMAIL_RE.test(e || '')))];
+    const espaces = contacts.map(e => { const t = jeton(e, CFG.secret_lien); return { token: t, html: pageEspaceSuivi(cfg(), S.cmds, S.mem, t) }; });
+    S.envoiEtat = `Envoi de ${n} email${n > 1 ? 's' : ''} client et du récapitulatif…`; renderEnvoi();
+    try {
+      await MCP.callTool('n8n', 'execute_workflow', { workflowId: WF_ENVOI, executionMode: 'production', triggerNodeName: 'Envoi depuis le simulateur',
+        inputs: { webhookData: { method: 'POST', body: { jour: S.T, messages: msgs, espaces } } } }, { cache: false });
+      S.envoiEtat = `✓ ${jour} : ${n} email${n > 1 ? 's' : ''} client et 1 récapitulatif partis vers ta boîte de test`;
+    } catch (e) {
+      const c = e && e.code;
+      S.envoiEtat = c === 'server_not_connected' ? 'Connecteur n8n absent : ajoute-le dans claude.ai, Paramètres › Connecteurs.'
+        : c === 'needs_reauth' ? 'Connecteur n8n à reconnecter dans claude.ai, Paramètres › Connecteurs.'
+        : c === 'not_in_manifest' || c === 'approval_required' || c === 'not_granted' ? 'Envoi non autorisé pour cette page : accepte l’accès à n8n quand Claude le demande.'
+        : c === 'server_unavailable' || c === 'upstream_error' ? 'n8n n’a pas répondu. Vérifie dans n8n si les emails sont partis avant de relancer ce jour.'
+        : `Échec de l’envoi (${c || 'erreur'}). Les emails restent visibles ici.`;
+    }
+    renderEnvoi();
+  }
+  function renderEnvoi() { const el = $('#envoi-etat'); if (el) el.textContent = S.envoiEtat; }
+  function suivant() {
+    if (S.ran) { const d = cal().addDays(parseDate(S.T), 1); S.T = toStr(d); S.ran = false; }
+    passage(); render();
+  }
+  const cmd = n => S.cmds.find(c => c.order_number === n);
+  function setStatus(s) { const c = cmd(S.sel); if (!c || c.status === s) return; log(c.order_number, 'action', 'STATUT', `Statut ERP : ${STAT[c.status] || c.status} → ${STAT[s]}`); c.status = s; render(); }
+  function decaler(n) {
+    const c = cmd(S.sel); const D = parseDate(c && c.delivery_date); if (!c || !D || !n) return;
+    const N = toStr(cal().addBD(D, n)); log(c.order_number, 'action', 'DATE', `Date annoncée : ${frShort(D)} → ${frShort(parseDate(N))} (${n > 0 ? '+' : ''}${n} j.o.)`); c.delivery_date = N; render();
+  }
+  function nouvelle(e) {
+    e.preventDefault();
+    const co = $('#nc-co').value.trim() || 'Nouveau client', em = $('#nc-em').value.trim() || 'contact@exemple.fr', j = parseInt($('#nc-j').value, 10) || 8;
+    const num = `CMD-${S.T.slice(2, 4)}-${String(1300 + S.seq++).padStart(4, '0')}`;
+    S.cmds.unshift({ order_number: num, company: co, contact_email: em, order_date: S.T, delivery_date: toStr(cal().addBD(parseDate(S.T), j)), status: 'Commande_confirmee', scenario: 'Créée dans le simulateur' });
+    log(num, 'action', 'CREATION', `Commande confirmée, livraison annoncée dans ${j} j.o.`); S.sel = num; render();
+  }
+  function espace(token) { S.espace = token; render(); const f = $('#espace'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+  const chip = (txt, cls) => `<span class="chip ${cls || ''}">${esc(txt)}</span>`;
+  const decOf = n => S.last ? S.last.decisions.find(d => d.order_number === n) : null;
+  const todayOf = n => S.journal.filter(j => j.T === S.T && j.order === n && j.kind !== 'action');
+  function mail(j, key) {
+    return `<details class="mail" ${S.open[key] ? 'open' : ''} data-k="${key}"><summary><span class="mk">✉</span><span class="ms"><b>${esc(TYPES[j.type] || j.type)}</b><br><span class="muted">${esc(j.detail)}</span></span></summary>`
+      + `<div class="mailhead"><span>À ${esc(j.to)}</span></div><div class="mailbody">${j.html}</div></details>`;
+  }
+  function render() {
+    const T = parseDate(S.T);
+    const nbMail = S.ran ? S.journal.filter(j => j.T === S.T && j.kind === 'email').length : 0;
+    const nbAl = S.ran ? S.journal.filter(j => j.T === S.T && j.kind === 'alerte').length : 0;
+    const weekend = !cal().isBD(T);
+    $('#date').innerHTML = `${esc(frDateY(T))}${weekend ? ' <span class="muted">· non ouvré</span>' : ''}`;
+    $('#etat').innerHTML = S.ran ? chip(`Passage de 7h fait · ${nbMail} email${nbMail > 1 ? 's' : ''} client · ${nbAl} alerte${nbAl > 1 ? 's' : ''}`, 'ok') : chip('Passage de 7h pas encore lancé', 'wait');
+    $('#go').textContent = S.ran ? 'Jour suivant · passage de 7h' : 'Lancer le passage de 7h';
+    $('#envoi-box').hidden = !ENVOI_OK; $('#envoi').checked = !!S.envoi; renderEnvoi();
+    // liste
+    const rows = S.cmds.map(c => {
+      const d = decOf(c.order_number), t = todayOf(c.order_number);
+      const em = t.filter(j => j.kind === 'email').length, al = t.filter(j => j.kind === 'alerte').length, bl = t.some(j => j.kind === 'bloque');
+      return `<tr class="${c.order_number === S.sel ? 'sel' : ''}" data-n="${esc(c.order_number)}" tabindex="0"><td class="num">${esc(c.order_number)}<div class="muted co">${esc(c.company)}</div></td>`
+        + `<td>${chip(STAT[c.status] || c.status, 's-' + c.status)}</td><td class="num">${c.delivery_date ? esc(frShort(parseDate(c.delivery_date))) : '–'}</td>`
+        + `<td class="ev">${em ? chip('✉ ' + em, 'mail') : ''}${al ? chip('⚠ ' + al, 'al') : ''}${bl ? chip('bloqué', 'al') : ''}${d && d.affichage && !em && !al ? `<span class="muted">${esc(d.affichage)}</span>` : ''}</td></tr>`;
+    }).join('');
+    $('#liste').innerHTML = S.cmds.length ? `<table><thead><tr><th>Commande</th><th>Statut ERP</th><th>Annoncée</th><th>Aujourd’hui</th></tr></thead><tbody>${rows}</tbody></table>`
+      : `<p class="empty">Aucune commande. Créez-en une ci-dessous, puis lancez le passage de 7h.</p>`;
+    // détail
+    const c = cmd(S.sel);
+    if (!c) $('#detail').innerHTML = `<p class="empty">Sélectionnez une commande dans la liste.</p>`;
+    else {
+      const m = S.mem.find(r => r.order_number === c.order_number);
+      const sent = m ? parseSent(m.sent) : [];
+      const d = decOf(c.order_number);
+      const jr = S.journal.filter(j => j.order === c.order_number);
+      const days = [...new Set(jr.map(j => j.T))].reverse();
+      const tok = jeton(c.contact_email, CFG.secret_lien);
+      $('#detail').innerHTML = `<div class="dh"><div><p class="eyebrow">${esc(c.order_number)}</p><h2>${esc(c.company)}</h2><p class="muted">${esc(c.contact_email)}</p></div>`
+        + `<button class="btn ghost" data-espace="${tok}">Voir son espace de suivi</button></div>`
+        + `<dl class="facts"><div><dt>Statut ERP</dt><dd>${esc(STAT[c.status] || c.status)}</dd></div><div><dt>Date annoncée</dt><dd>${c.delivery_date ? esc(frDateY(parseDate(c.delivery_date))) : '–'}</dd></div>`
+        + `<div><dt>Date initiale</dt><dd>${m && m.initial_delivery_date ? esc(frShort(parseDate(m.initial_delivery_date))) : '–'}</dd></div><div><dt>Reports</dt><dd>${m ? Number(m.nb_glissements || 0) : 0}</dd></div>`
+        + `<div class="wide"><dt>Déjà envoyé au client</dt><dd>${sent.length ? sent.map(k => chip(TYPES[k.split('|')[0]] || k)).join(' ') : '<span class="muted">rien</span>'}</dd></div>`
+        + (d && d.pourquoi.length ? `<div class="wide"><dt>Pourquoi, au dernier passage</dt><dd>${esc(d.pourquoi.join(' '))}</dd></div>` : '') + `</dl>`
+        + `<div class="actions"><p class="lbl">Ce que fait l’équipe dans la journée <span class="muted">(pris en compte au prochain passage)</span></p>`
+        + `<div class="row">${['Commande_confirmee', 'En_preparation', 'Expediee', 'Livree'].map(s => `<button class="btn ${c.status === s ? 'on' : ''}" data-st="${s}">${STAT[s]}</button>`).join('')}</div>`
+        + `<div class="row"><label for="dj">Décaler la date de</label><input id="dj" type="number" value="3" step="1" min="-20" max="30"><span>j.o.</span><button class="btn" id="dec">Décaler</button><button class="btn ghost" data-st="Annulee">Annuler la commande</button></div></div>`
+        + `<div class="journal"><p class="lbl">Journal de la commande</p>${days.length ? days.map(day => `<div class="day"><p class="dayh">${esc(frDate(parseDate(day)))}</p>`
+          + jr.filter(j => j.T === day).map((j, i) => j.kind === 'email' ? mail(j, `${c.order_number}|${day}|${i}`)
+            : `<p class="ent ${j.kind}"><span class="mk">${j.kind === 'alerte' ? '⚠' : j.kind === 'bloque' ? '⛔' : '✎'}</span><span>${j.kind === 'alerte' ? `<b>${esc((LIBELLES[j.type] || [j.type])[0])}</b> · ` : ''}${esc(j.detail)}</span></p>`).join('') + `</div>`).join('')
+          : '<p class="muted">Rien encore. Lancez le passage de 7h.</p>'}</div>`;
+    }
+    // espace
+    $('#espace-wrap').hidden = !S.espace;
+    if (S.espace) $('#espace').srcdoc = pageEspaceSuivi(cfg(), S.cmds, S.mem, S.espace);
+    // sorties du jour
+    const mails = S.journal.filter(j => j.T === S.T && j.kind === 'email');
+    $('#jour').innerHTML = !S.ran ? `<p class="empty">Le passage de 7h n’a pas encore tourné pour ce jour.</p>`
+      : `<div class="cols"><div><p class="lbl">Emails clients (${mails.length})</p>${mails.length ? mails.map((j, i) => `<p class="muted to">${esc(j.order)}</p>` + mail(j, `jour|${S.T}|${i}`)).join('') : '<p class="muted">Aucun email client ce matin.</p>'}</div>`
+      + `<div><p class="lbl">Récapitulatif interne</p><details class="mail" ${S.open['digest'] ? 'open' : ''} data-k="digest"><summary><span class="mk">⚠</span><span class="ms"><b>${esc(S.last.digest.sujet)}</b></span></summary><div class="mailbody">${S.last.digest.html}</div></details></div></div>`;
+  }
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href*="?c="]');
+    if (a) { e.preventDefault(); espace(new URL(a.href).searchParams.get('c')); return; }
+    const tr = e.target.closest('tr[data-n]'); if (tr) { S.sel = tr.dataset.n; render(); return; }
+    const st = e.target.closest('[data-st]'); if (st) { setStatus(st.dataset.st); return; }
+    const es = e.target.closest('[data-espace]'); if (es) { espace(es.dataset.espace); return; }
+    if (e.target.closest('#dec')) { decaler(parseInt($('#dj').value, 10)); return; }
+    if (e.target.closest('#go')) { suivant(); return; }
+    if (e.target.closest('#reset-demo')) { init('demo'); return; }
+    if (e.target.closest('#reset-zero')) { init('zero'); return; }
+    if (e.target.closest('#close-espace')) { S.espace = null; render(); }
+  });
+  document.addEventListener('toggle', e => { const k = e.target.dataset && e.target.dataset.k; if (k) S.open[k] = e.target.open; }, true);
+  document.addEventListener('keydown', e => { const tr = e.target.closest && e.target.closest('tr[data-n]'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); S.sel = tr.dataset.n; render(); } });
+  $('#nc').addEventListener('submit', nouvelle);
+  document.addEventListener('change', e => { if (e.target.id === 'envoi') { S.envoi = e.target.checked; S.envoiEtat = S.envoi ? 'Envoi réel activé : chaque passage enverra ses emails.' : ''; renderEnvoi(); } });
+  init('demo');
+  if (window.claude && window.claude.use) window.claude.use('mcp').then(m => { if (m) { MCP = m; ENVOI_OK = true; render(); } }).catch(() => {});
+})();
+
+</script>
+</body></html>

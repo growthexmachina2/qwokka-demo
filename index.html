@@ -1,0 +1,49 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kit de démo · Suivi de commande client</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Permanent+Marker&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : page d'accueil du kit. Bandeau marque, promesse, puis 4 cartes dans l'ordre de la démo. */
+:root{--bg:#F7F5F0;--surface:#FFFDF8;--fg:#15171C;--muted:#5F6470;--line:#DCD8CF;--accent:#FF4D1F;--accent-ink:#C2360F;
+--display:"Sora",system-ui,Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--hand:"Permanent Marker","Brush Script MT",cursive}
+@media (prefers-color-scheme:dark){:root{--bg:#15171C;--surface:#1E2027;--fg:#F2F0EA;--muted:#A3A7B1;--line:#33363F;--accent:#FF5A2C;--accent-ink:#FF8A66;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--display);line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-block:40px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:32px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.g{font-family:var(--hand);color:var(--accent);font-size:28px;transform:rotate(-6deg);display:inline-block}
+.x{font-weight:800;letter-spacing:.3em;font-size:15px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);margin:0}
+h1{font-size:clamp(34px,6vw,64px);line-height:1.02;margin:6px 0 12px;letter-spacing:-.03em;font-weight:800;text-wrap:balance}
+h1 small{display:block;font-size:.42em;font-weight:600;color:var(--accent-ink);letter-spacing:-.01em;margin-top:6px}
+.lede{color:var(--muted);max-width:64ch;margin:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:10px;align-content:start}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.n{font-family:var(--mono);color:var(--accent-ink);font-size:13px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card ul{margin:0;padding-left:18px;font-size:15px;display:grid;gap:4px}
+a.btn{justify-self:start;display:inline-block;background:var(--fg);color:var(--bg);text-decoration:none;font-weight:700;border-radius:999px;padding:9px 16px;font-size:14px;margin-top:4px}
+a.btn:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+a{color:var(--accent-ink)}
+.mono{font-family:var(--mono);font-size:13px;word-break:break-all}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+</style></head><body><div class="wrap">
+<header>
+<p class="brand"><span class="g">Growth</span><span class="x">EX MACHINA</span></p>
+<p class="eyebrow" style="margin-top:28px">Cas pratique · Lead Delivery &amp; AI Automation · Qwokka</p>
+<h1>Libérer le support client,<small>anticiper les demandes clients.</small></h1>
+<p class="lede">Suivi de commande client automatisé pour un distributeur B2B : chaque matin à 7h, le flux lit l’ERP, prévient les clients au bon moment et alerte l’équipe quand une décision lui revient. Les données de démo sont fictives (« Distri Pro »).</p>
+</header>
+<div class="cards">
+<section class="card"><span class="n">1 · Comprendre</span><h2>La présentation</h2><p>Le brief, les scénarios phase par phase, les règles retenues, l’architecture et la mise en service. En annexe : les 60 scénarios et les 32 invisibles pour l’ERP.</p><a class="btn" href="presentation/">Ouvrir la présentation</a></section>
+<section class="card"><span class="n">2 · Valider</span><h2>Qui recevrait quoi</h2><p>Le flux n8n réel appliqué aux 30 commandes de démo : pour chacune, l’email client, les alertes équipe et la raison. Rien n’est envoyé.</p><a class="btn" href="https://exmachina.app.n8n.cloud/webhook/qwokka-apercu">Ouvrir l’aperçu</a></section>
+<section class="card"><span class="n">3 · Jouer</span><h2>Le simulateur</h2><p>Les mêmes règles, jour après jour : créez une commande, avancez le temps, décalez une date, livrez. Emails, alertes et espace de suivi s’affichent à chaque étape.</p><a class="btn" href="simulateur/">Ouvrir le simulateur</a></section>
+<section class="card"><span class="n">4 · Côté client</span><h2>L’espace de suivi</h2><p>Ce que voit le client final en cliquant sur « Suivre mes commandes » : toutes ses commandes, leur étape, leur date. Exemple :</p><a class="btn" href="https://exmachina.app.n8n.cloud/webhook/suivi-commande?c=xwyo2lr80hq8qxxt">Voir un espace client</a></section>
+</div>
+<section class="card"><span class="n">En direct</span><h2>La démo avec envois réels</h2><ul>
+<li>Workflows n8n : passage quotidien de 7h, espace de suivi, réinitialisation du jeu de démo.</li>
+<li>Envois par SendGrid depuis un domaine authentifié, redirigés vers une boîte de test pendant la démo.</li>
+<li>Présentée en direct par Gabriel : les emails arrivent pendant la démonstration.</li></ul></section>
+<section class="card"><span class="n">Livrables</span><h2>Workflows n8n et jeu de données</h2><p>Les 3 workflows à importer dans votre n8n, les 30 commandes de démo et la mémoire de la veille (CSV et JSON), avec le mode d’installation.</p><a class="btn" href="https://github.com/growthexmachina2/qwokka-demo#installer-les-workflows-dans-votre-n8n">Voir les fichiers</a></section>
+<footer>Gabriel Videira · Growth Ex Machina · Données fictives à des fins de démonstration.</footer>
+</div></body></html>
