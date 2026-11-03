@@ -126,7 +126,7 @@ body:not(.show-notes) .notes{display:none}
 <x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
 <div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFE4D9;border:2px solid #FF4D1F;border-radius:14px;padding:24px">
 <p style="font-size:26px;font-weight:800">D − 3</p>
-<p style="font-size:24px;color:#15171C">tout doit être arrivé</p>
+<p style="font-size:24px;color:#15171C">dernier jour d’arrivée des pièces</p>
 </div>
 <x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
 <div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:24px">
@@ -136,7 +136,7 @@ body:not(.show-notes) .notes{display:none}
 <x-shape kind="arrow-right" style="background:#5F6470;width:48px;height:24px"></x-shape>
 <div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:1px solid #DCD8CF;border-radius:14px;padding:24px">
 <p style="font-size:26px;font-weight:800">Livraison</p>
-<p style="font-size:24px;color:#5F6470">J+1, le jour D</p>
+<p style="font-size:24px;color:#5F6470">J+1 après l’expédition : le jour D</p>
 </div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
@@ -155,7 +155,7 @@ body:not(.show-notes) .notes{display:none}
 </div>
 <p style="position:absolute;left:128px;bottom:64px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:1px;color:#5F6470">GROWTH EX MACHINA × QWOKKA</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5F6470">03 / 17</p>
-<aside>2 jours ouvrés de préparation et d’expédition, puis J+1 : 3 jours incompressibles. Les pièces doivent donc être là au plus tard à D − 3. Tous les calculs sont en jours ouvrés (hypothèse à confirmer). Le retard se détecte en une seule lecture de l’ERP : date du jour, statut, date annoncée.</aside>
+<aside>Énoncé : 2 jours en interne pour préparer et expédier, puis livraison en J+1 par le transporteur. Soit 3 jours incompressibles : préparation D − 2 et D − 1, expédition le soir de D − 1, livraison le jour D. Les pièces doivent donc être arrivées au plus tard le soir de D − 3. Tous les calculs sont en jours ouvrés (hypothèse à confirmer). Le retard se détecte en une seule lecture de l’ERP : date du jour, statut, date annoncée.</aside>
 </section></div></div>
 <div class="frame" id="s5" data-n="5"><div class="scaler"><section id="methode" data-transition="fade" style="background:#15171C;color:#F2F0EA;font-family:'Sora', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
@@ -434,7 +434,7 @@ body:not(.show-notes) .notes{display:none}
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 56px">
 <p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>1 ·</b> Calculs en jours ouvrés, livraison comprise (week-ends et fériés exclus)</p>
-<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>2 ·</b> Pièces au plus tard à D − 3 ; le jour d’arrivée ne compte pas</p>
+<p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>2 ·</b> Pièces arrivées au plus tard le soir de D − 3 : préparation D − 2 et D − 1, livraison le jour D</p>
 <p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>3 ·</b> Passage tous les jours à 7h, envois compris le week-end</p>
 <p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>4 ·</b> Paliers de retard : 1 à 3 jours, 4 jours ou plus</p>
 <p style="font-size:25px;line-height:1.4;border-top:1px solid #DCD8CF;padding:14px 0 0"><b>5 ·</b> Alerte « risque de retard » à D − 3, réglable</p>

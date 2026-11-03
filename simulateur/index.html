@@ -260,7 +260,7 @@ function moteur(cfg, cmds, memRows) {
           if (!msg) {
             if ((nouveau && premierPassage) || has(`REPRISE|${o.delivery_date}`)) { if (nouveau) r.marqueur = `REPRISE|${o.delivery_date}`; alerte('RETARD_EXISTANT', `Déjà en retard à la mise en service (pièces attendues avant le ${frShort(L)}) : client à prévenir par l’équipe`); r.pourquoi.push('Déjà en retard à la mise en service du flux : pas de message client, l’équipe décide.'); }
             else {
-              alerte('PROBLEME_NON_RESOLU', `Pièces attendues avant le ${frShort(L)}, aucune nouvelle date saisie`);
+              alerte('PROBLEME_NON_RESOLU', `Pièces attendues au plus tard le ${frShort(L)}, aucune nouvelle date saisie`);
               if (nouveau) { situation = { retard: 'appro', cle: `RETARD_EN_COURS|${o.delivery_date}` }; r.pourquoi.push(`Découverte déjà en retard (date limite ${frShort(L)} dépassée) : l’email de suivi annonce le retard.`); }
               else if (!has(`RETARD_EN_COURS|${o.delivery_date}`)) { msg = { type: 'RETARD_EN_COURS' }; r.pourquoi.push(`Retard certain (date limite ${frShort(L)} dépassée), rien n’a été saisi : filet de sécurité.`); }
               else r.pourquoi.push('Client déjà prévenu de ce retard : alerte interne quotidienne seulement.');
@@ -399,7 +399,7 @@ function rendreEmailClient(m, o, D, cfg, lienEspace, cal) {
 
 // ===== Récapitulatif interne quotidien =====
 const LIBELLES = {
-  PROBLEME_NON_RESOLU: ['Retard sans nouvelle date · client notifié', 1], RETARD_EXISTANT: ['Déjà en retard à la mise en service', 1],
+  PROBLEME_NON_RESOLU: ['Retard sans nouvelle date', 1], RETARD_EXISTANT: ['Déjà en retard à la mise en service', 1],
   DATE_COMPROMISE: ['Date compromise en préparation', 1], RETARD_REPETE: ['Reports de date répétés', 2],
   RISQUE_RETARD: ['Risque de retard', 2], PREPA_DEPASSEE: ['Délai de préparation dépassé', 3],
   LIVRAISON_NON_CONFIRMEE: ['Livraison non confirmée', 3], EMAIL_INVALIDE: ['Email non délivrable', 4],
@@ -470,20 +470,30 @@ function pageApercu(cfg, res, cmds) {
   const T = parseDate(cfg.date_reference);
   const ATT = new Map(cmds.map(c => [c.order_number, c]));
   const nbClient = res.decisions.filter(r => r.client).length;
-  const lignes = res.decisions.map(r => {
+  // Position par rapport à la date annoncée, en jours ouvrés : D − 3, D, D + 2…
+  const cal = makeCalendar(cfg.fermetures);
+  const JC = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+  const jour = s => { const d = parseDate(s); return d ? `${JC[d.getUTCDay()]} ${frShort(d)}` : '–'; };
+  const ecart = r => { const D = parseDate(r.delivery_date); return D ? cal.diffBD(T, D) : null; };
+  const position = n => n === null ? '–' : n === 0 ? 'D' : n > 0 ? `D − ${n}` : `D + ${-n}`;
+  // Tri : commandes en cours de la plus urgente (la plus en retard) à la plus lointaine, puis livrées, puis données inexploitables
+  const groupe = r => (ecart(r) === null || !STATUTS.includes(r.status)) ? 2 : r.status === 'Livree' ? 1 : 0;
+  const tries = [...res.decisions].sort((a, b) => groupe(a) - groupe(b) || (ecart(a) ?? 0) - (ecart(b) ?? 0));
+  const lignes = tries.map(r => {
     const c = ATT.get(r.order_number) || {};
-    return `<tr><td class="num">${esc(r.order_number)}<div class="muted">${esc(r.company)}</div></td><td>${esc(r.status)}</td><td>${r.delivery_date ? frShort(parseDate(r.delivery_date)) : '–'}</td>`
+    const n = ecart(r);
+    return `<tr><td class="num">${esc(r.order_number)}<div class="muted">${esc(r.company)}</div></td><td class="num">${esc(jour(c.order_date))}</td><td class="num">${esc(jour(r.delivery_date))}</td><td class="pos${r.alertes.length ? ' chaud' : ''}">${position(n)}</td><td>${esc(r.status)}</td>`
       + `<td>${r.client ? `<b>${esc(r.client.type)}</b>` : r.client_bloque ? `<span class="ko">bloqué : ${esc(r.client_bloque.raison)}</span>` : '<span class="muted">–</span>'}</td>`
       + `<td>${r.alertes.map(a => `<span class="pill">${esc(a.type)}</span>`).join(' ') || '<span class="muted">–</span>'}</td>`
-      + `<td class="muted">${esc(r.pourquoi.join(' '))}${c.scenario ? `<div class="scen">Scénario : ${esc(c.scenario)}</div>` : ''}</td></tr>`;
+      + `<td class="muted why">${esc(r.pourquoi.join(' '))}${c.scenario ? `<div class="scen">Scénario : ${esc(c.scenario)}</div>` : ''}</td></tr>`;
   }).join('');
   const emails = res.decisions.filter(r => r.client).map(r => `<article class="mail"><div class="mh"><span class="muted">À</span> ${esc(r.contact_email)}<br><span class="muted">Objet</span> <b>${esc(r.client.sujet)}</b></div><div class="mb">${r.client.html}</div></article>`).join('');
-  const css = PAGE_CSS + `.wrap{max-width:1200px}table{width:100%;border-collapse:collapse;font-size:14px;background:#FFFDF8}th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#5F6470;padding:10px;border-bottom:1px solid #DCD8CF}td{padding:10px;border-top:1px solid #DCD8CF;vertical-align:top}.box{overflow-x:auto;border:1px solid #DCD8CF;border-radius:14px;margin-top:16px}.pill{display:inline-block;font-size:12px;background:#FFE4D9;color:#8E2A0B;border-radius:6px;padding:2px 7px;margin:1px 0}.ko{color:#8E2A0B;font-weight:600}.scen{color:#15171C;font-style:italic;margin-top:4px}.mails{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:16px;margin-top:16px}.mail{background:#fff;border:1px solid #DCD8CF;border-radius:14px;overflow:hidden}.mh{padding:12px 16px;border-bottom:1px solid #DCD8CF;font-size:14px}.mb{padding:16px}h2{font-size:22px;margin:36px 0 0}`;
+  const css = PAGE_CSS + `.wrap{max-width:1560px}td.why{min-width:380px}table{width:100%;border-collapse:collapse;font-size:14px;background:#FFFDF8}th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#5F6470;padding:10px;border-bottom:1px solid #DCD8CF}td{padding:10px;border-top:1px solid #DCD8CF;vertical-align:top}.box{overflow-x:auto;border:1px solid #DCD8CF;border-radius:14px;margin-top:16px}.pill{display:inline-block;font-size:12px;background:#FFE4D9;color:#8E2A0B;border-radius:6px;padding:2px 7px;margin:1px 0}.ko{color:#8E2A0B;font-weight:600}.scen{color:#15171C;font-style:italic;margin-top:4px}td.pos{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:500;white-space:nowrap}td.pos.chaud{color:#C2360F;font-weight:700}td.num{white-space:nowrap}.mails{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:16px;margin-top:16px}.mail{background:#fff;border:1px solid #DCD8CF;border-radius:14px;overflow:hidden}.mh{padding:12px 16px;border-bottom:1px solid #DCD8CF;font-size:14px}.mb{padding:16px}h2{font-size:22px;margin:36px 0 0}`;
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Qui recevrait quoi · ${esc(cfg.marque)}</title>`
     + `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap"><style>${css}</style></head><body><div class="wrap">`
     + `<p class="eyebrow">Aperçu · aucun email envoyé · ${esc(frDateY(T))}</p><h1>Qui recevrait quoi ce matin</h1>`
     + `<p class="muted">${res.decisions.length} commandes analysées · ${nbClient} email(s) client · 1 récapitulatif interne (${res.digest.nb_alertes} alerte(s))${res.premierPassage ? ' · premier passage : aucune notification client' : ''}</p>`
-    + `<div class="box"><table><tr><th>Commande</th><th>Statut ERP</th><th>Annoncée</th><th>Email client</th><th>Alertes équipe</th><th>Pourquoi</th></tr>${lignes}</table></div>`
+    + `<div class="box"><table><tr><th>Commande</th><th>Commandée le</th><th>Livraison annoncée</th><th>Position</th><th>Statut ERP</th><th>Email client</th><th>Alertes équipe</th><th>Pourquoi</th></tr>${lignes}</table></div>`
     + `<h2>Emails clients</h2><div class="mails">${emails || '<p class="muted">Aucun email client.</p>'}</div>`
     + `<h2>Récapitulatif interne</h2><article class="mail" style="margin-top:16px"><div class="mh"><span class="muted">Objet</span> <b>${esc(res.digest.sujet)}</b></div><div class="mb">${res.digest.html}</div></article>`
     + `</div></body></html>`;
