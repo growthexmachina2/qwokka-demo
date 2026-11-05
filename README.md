@@ -23,4 +23,4 @@ Site : https://growthexmachina2.github.io/qwokka-demo/
 
 Modes du workflow 1 : planifié à 7h = *simulation* (rien ne part) tant que le distributeur n’a pas validé ; lancement manuel = *test* (envois réels redirigés vers la boîte de test) ; aperçu web = page « qui recevrait quoi ».
 
-Les données sont fictives. Le jeu de démo est daté du 28 octobre 2026 dans `donnees/` ; le workflow 0 le recrée avec des dates relatives au jour de son lancement.
+Les données sont fictives. Le jeu de démo est daté du 5 novembre 2026 dans `donnees/` ; le workflow 0 le recrée avec des dates relatives au jour de son lancement.
