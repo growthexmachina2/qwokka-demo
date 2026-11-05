@@ -120,17 +120,10 @@ form.nc input[type=text],form.nc input[type=email]{width:auto;flex:1 1 160px;min
     <div class="envoi" id="envoi-box" hidden><label><input type="checkbox" id="envoi"> Envoyer les emails pour de vrai, vers ta boîte de test (via n8n et SendGrid)</label><span id="envoi-etat" aria-live="polite"></span></div>
   </div>
 
-  <details class="panel guide">
-    <summary>Déroulé conseillé pour la démo, en 2 minutes</summary>
-    <ol>
-      <li>« Partir de zéro », puis créer une commande livrable dans 6 jours ouvrés.</li>
-      <li>« Lancer le passage de 7h » : le client reçoit l’email de suivi avec son lien.</li>
-      <li>« Jour suivant » jusqu’à D − 3 : alerte « risque de retard » pour l’équipe, rien pour le client.</li>
-      <li>« Jour suivant » : D − 2 sans nouvelle date, le client est prévenu du retard.</li>
-      <li>Décaler la date de 5 jours ouvrés, puis « Jour suivant » : email « nouvelle date », palier 2.</li>
-      <li>Passer en préparation, expédiée, livrée en avançant les jours : email « livrée, avec nos excuses ».</li>
-      <li>À tout moment : « Voir son espace de suivi ».</li>
-    </ol>
+  <details class="panel guide" open>
+    <summary>Déroulé conseillé pour la démo, calculé pour aujourd’hui</summary>
+    <ol id="guide-ol"></ol>
+    <p class="muted" style="margin-top:8px">Les dates s’ajustent chaque jour pour que D − 3 et D − 2 tombent sur deux jours ouvrés consécutifs (week-ends et fériés évités). Pour changer une date, utilisez toujours « Décaler la date » dans la fiche : le formulaire crée une nouvelle commande.</p>
   </details>
 
   <div class="main">
@@ -140,7 +133,7 @@ form.nc input[type=text],form.nc input[type=email]{width:auto;flex:1 1 160px;min
       <form class="nc" id="nc">
         <input id="nc-co" type="text" placeholder="Entreprise" value="Chantiers Martin" aria-label="Entreprise">
         <input id="nc-em" type="email" placeholder="Email du contact" value="achats@chantiers-martin.fr" aria-label="Email du contact">
-        <label for="nc-j">Livraison dans</label><input id="nc-j" type="number" value="6" min="1" max="40"><span>j.o.</span>
+        <label for="nc-j">Livraison dans</label><input id="nc-j" type="number" value="5" min="1" max="40"><span>j.o.</span>
         <button class="btn" type="submit">Créer la commande</button>
       </form>
     </section>
@@ -637,6 +630,28 @@ function genererDemo(cfg) {
   }
   function espace(token) { S.espace = token; render(); const f = $('#espace'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
+  // Déroulé de démo calculé pour le jour de départ : plus petit délai où D − 3 et D − 2 sont deux jours ouvrés consécutifs
+  function guide(T0s) {
+    const c = cal(), T0 = parseDate(T0s), J = d => frDate(d), sd = d => toStr(d);
+    let n = 4, D, L, D2;
+    for (; n < 20; n++) { D = c.addBD(T0, n); L = c.addBD(D, -3); D2 = c.addBD(D, -2); if (L > T0 && c.diffBD(L, D2) === 1 && toStr(c.addDays(L, 1)) === toStr(D2)) break; }
+    const nbClics = Math.round((L - T0) / 864e5);
+    const N1 = c.addDays(D2, 1), N2 = c.addDays(D2, 2), N3 = c.addDays(D2, 3), N4 = c.addDays(D2, 4), D2b = c.addBD(D, 5);
+    const it = [
+      `« Partir de zéro » (le bandeau indique ${esc(frDateY(T0))}).`,
+      `Formulaire du bas : « Livraison dans <b>${n}</b> j.o. », puis « Créer la commande ». Livraison annoncée le <b>${esc(J(D))}</b>.`,
+      `« Lancer le passage de 7h » : <b>email de suivi + lien</b> au client.`,
+      `« Jour suivant » ${nbClics} fois, jusqu’au <b>${esc(J(L))} (D − 3)</b> : alerte « risque de retard » pour l’équipe, rien pour le client.`,
+      `« Jour suivant » : <b>${esc(J(D2))} (D − 2)</b>, rien n’a été saisi : le client reçoit « votre livraison sera retardée ».`,
+      `Dans la fiche : « Décaler la date de 5 j.o. » puis « Décaler » (nouvelle date : ${esc(J(D2b))}). « Jour suivant » (${esc(J(N1))}) : email <b>« nouvelle date »</b>, palier 2.`,
+      `« En préparation » puis « Jour suivant » (${esc(J(N2))}) : rien. « Expédiée » puis « Jour suivant » (${esc(J(N3))}) : rien.`,
+      `« Livrée » puis « Jour suivant » (${esc(J(N4))}) : email <b>« livrée, avec nos excuses »</b>.`,
+      `À tout moment : « Voir son espace de suivi ».`];
+    const ol = $('#guide-ol'); if (ol) ol.innerHTML = it.map(x => `<li>${x}</li>`).join('');
+    const nj = $('#nc-j'); if (nj) nj.value = n;
+    return { n, D: sd(D), L: sd(L), D2: sd(D2), nbClics };
+  }
+  window.__guide = guide;
   const chip = (txt, cls) => `<span class="chip ${cls || ''}">${esc(txt)}</span>`;
   const decOf = n => S.last ? S.last.decisions.find(d => d.order_number === n) : null;
   const todayOf = n => S.journal.filter(j => j.T === S.T && j.order === n && j.kind !== 'action');
@@ -714,6 +729,7 @@ function genererDemo(cfg) {
   $('#nc').addEventListener('submit', nouvelle);
   document.addEventListener('change', e => { if (e.target.id === 'envoi') { S.envoi = e.target.checked; S.envoiEtat = S.envoi ? 'Envoi réel activé : chaque passage enverra ses emails.' : ''; renderEnvoi(); } });
   init('demo');
+  guide(S.T);
   if (window.claude && window.claude.use) window.claude.use('mcp').then(m => { if (m) { MCP = m; ENVOI_OK = true; render(); } }).catch(() => {});
 })();
 
